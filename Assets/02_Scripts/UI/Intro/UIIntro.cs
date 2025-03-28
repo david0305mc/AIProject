@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
+using UniRx;
+
 public class UIIntro : MonoBehaviour
 {
     [SerializeField] private Button _buttonStart;
