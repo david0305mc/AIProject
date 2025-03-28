@@ -20,6 +20,11 @@ public class PlayerController : MonoBehaviour
         currentMovementSpeed = baseMovementSpeed;
     }
 
+    private void Start()
+    {
+        currentMovementSpeed = baseMovementSpeed;
+    }
+
     private void Update()
     {
         // 입력값 처리만 Update에서 수행
