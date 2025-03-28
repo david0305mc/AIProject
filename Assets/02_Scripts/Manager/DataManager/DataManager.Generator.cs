@@ -7,164 +7,193 @@ using System.Linq;
 
 public partial class DataManager
 {
-    static readonly string DATATABLE_DEF_PATH = "Assets/02_Scripts/Manager/DataManager/DataManager.Data.cs";
-    static readonly string CONFIG_TABLE_DEF_PATH = "Assets/02_Scripts/Manager/DataManager/ConfigTable.cs";
-    static readonly string TABLE_ENUM_DEF_PATH = "Assets/02_Scripts/Manager/DataManager/EnumTable.cs";
-
-    //static readonly string LOCAL_CSV_PATH = $"{Application.dataPath}/../Cache/dev";
-    static readonly string LOCAL_CSV_PATH = $"{Application.dataPath}/Resources/Data";
-
-    static readonly string CONFIG_TABLE_NAME = "ConfigTable.csv";
-    static readonly string ENUM_TABLE_NAME = "EnumTable.csv";
+    private static readonly string DATATABLE_DEF_PATH = "Assets/02_Scripts/Manager/DataManager/DataManager.Data.cs";
+    private static readonly string CONFIG_TABLE_DEF_PATH = "Assets/02_Scripts/Manager/DataManager/ConfigTable.cs";
+    private static readonly string TABLE_ENUM_DEF_PATH = "Assets/02_Scripts/Manager/DataManager/EnumTable.cs";
+    private static readonly string LOCAL_CSV_PATH = $"{Application.dataPath}/Resources/Data";
+    private static readonly string CONFIG_TABLE_NAME = "ConfigTable.csv";
+    private static readonly string ENUM_TABLE_NAME = "EnumTable.csv";
 
     public static void GenDatatable()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.Append("#pragma warning disable 114\n");
-        sb.Append("using System;\n");
-        sb.Append("using System.Collections;\n");
-        sb.Append("using System.Collections.Generic;\n");
-        sb.Append("using System.Linq;\n");
+        try
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("#pragma warning disable 114");
+            sb.AppendLine("using System;");
+            sb.AppendLine("using System.Collections;");
+            sb.AppendLine("using System.Collections.Generic;");
+            sb.AppendLine("using System.Linq;");
+            sb.AppendLine("using UnityEngine;");
+            sb.AppendLine();
+            sb.AppendLine("public partial class DataManager {");
 
-        sb.AppendLine("public partial class DataManager {");
-        GenTableData(sb);
+            GenTableData(sb);
+            sb.AppendLine("}");
 
-        sb.Append("};");
-        WriteCode(DATATABLE_DEF_PATH, sb.ToString());
+            WriteCode(DATATABLE_DEF_PATH, sb.ToString());
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"데이터 테이블 생성 실패: {e.Message}");
+            throw;
+        }
     }
 
     private static void GenTableData(StringBuilder sb)
     {
-        foreach (var tableName in DataManager.tableNames)
+        foreach (var tableName in tableNames)
         {
-            var data = Util.LoadFromFile(Path.Combine(LOCAL_CSV_PATH, $"{tableName}.csv"));
-            List<string[]> rows = CSVSerializer.ParseCSV(data, '|');
-
-            string tableNameUpper = $"{tableName[0].ToString().ToUpper()}{tableName.Substring(1).ToLower()}";
-            string arrayName = $"{tableNameUpper}Array";
-            string dicName = $"{tableNameUpper}Dic";
-
-            sb.AppendFormat("\tpublic partial class {0} {{\n", tableName);
-
-            Enumerable.Range(0, rows[0].Length).ToList().ForEach(i =>
+            try
             {
-                var type = rows[1][i];
-                if (!(type == "int" || type == "long" || type == "float" || type == "string"))
+                var data = File.ReadAllText(Path.Combine(LOCAL_CSV_PATH, $"{tableName}.csv"));
+                var rows = CSVSerializer.ParseCSV(data, '|');
+
+                string tableNameUpper = $"{tableName[0].ToString().ToUpper()}{tableName.Substring(1).ToLower()}";
+                string arrayName = $"{tableNameUpper}Array";
+                string dicName = $"{tableNameUpper}Dic";
+
+                sb.AppendLine($"\tpublic partial class {tableName} {{");
+
+                for (int i = 0; i < rows[0].Length; i++)
                 {
-                    type = type.ToUpper();
+                    var type = rows[1][i];
+                    if (!(type == "int" || type == "long" || type == "float" || type == "string"))
+                    {
+                        type = type.ToUpper();
+                    }
+                    sb.AppendLine($"\t\tpublic {type} {rows[0][i].ToLower()};");
                 }
-                sb.AppendFormat($"\t\tpublic {type} {rows[0][i].ToLower()};\n");
-            });
-            var keyType = rows[1][0];
-            if (!(keyType == "int" || keyType == "long" || keyType == "float" || keyType == "string"))
-            {
-                keyType = keyType.ToLower();
+
+                var keyType = rows[1][0];
+                if (!(keyType == "int" || keyType == "long" || keyType == "float" || keyType == "string"))
+                {
+                    keyType = keyType.ToLower();
+                }
+
+                sb.AppendLine("\t}");
+                sb.AppendLine($"\tpublic {tableName}[] {arrayName} {{ get; private set; }}");
+                sb.AppendLine($"\tpublic Dictionary<{keyType}, {tableName}> {dicName} {{ get; private set; }}");
+
+                sb.AppendLine($"\tpublic void Bind{tableName}Data(Type type, string text) {{");
+                sb.AppendLine("\t\tvar deserializedData = CSVDeserialize(text, type);");
+                sb.AppendLine($"\t\tGetType().GetProperty(nameof({arrayName})).SetValue(this, deserializedData, null);");
+                sb.AppendLine($"\t\t{dicName} = {arrayName}.ToDictionary(i => i.id);");
+                sb.AppendLine("\t}");
+
+                sb.AppendLine($"\tpublic {tableName} Get{tableName}Data({keyType} _id) {{");
+                sb.AppendLine($"\t\tif ({dicName}.TryGetValue(_id, out {tableName} value)) {{");
+                sb.AppendLine("\t\t\treturn value;");
+                sb.AppendLine("\t\t}");
+                sb.AppendLine($"\t\tDebug.LogError($\"테이블에 ID가 없습니다: {{_id}}\");");
+                sb.AppendLine("\t\treturn null;");
+                sb.AppendLine("\t}");
             }
-
-            sb.Append("\t};\n");
-            sb.Append($"\tpublic {tableName}[] {arrayName} {{ get; private set; }}\n");
-            sb.Append($"\tpublic Dictionary<{keyType}, {tableName}> {dicName} {{ get; private set; }}\n");
-
-            sb.Append($"\tpublic void Bind{tableName}Data(Type type, string text){{\n");
-            sb.Append("\t\tvar deserializaedData = CSVDeserialize(text, type);\n");
-            sb.Append($"\t\tGetType().GetProperty(nameof({arrayName})).SetValue(this, deserializaedData, null);\n");
-            sb.Append($"\t\t{dicName} = {arrayName}.ToDictionary(i => i.id);\n");
-            sb.Append("\t}\n");
-
-            sb.Append($"\tpublic {tableName} Get{tableName}Data({keyType} _id){{\n");
-            sb.Append($"\t\tif ({dicName}.TryGetValue(_id, out {tableName} value)){{\n");
-            sb.Append($"\t\t\treturn value;\n");
-            sb.Append($"\t\t}}\n");
-
-            string errorMsg = $"table doesnt contain id {{_id}}";
-            sb.Append($"\t\tUnityEngine.Debug.LogError($\"{errorMsg}\");\n");
-            sb.Append("\t\treturn null;\n");
-            sb.Append("\t}\n");
+            catch (Exception e)
+            {
+                Debug.LogError($"테이블 생성 실패 {tableName}: {e.Message}");
+                throw;
+            }
         }
     }
 
     public static void GenConfigTable()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.Append("#pragma warning disable 114\n");
-        sb.Append("using System;\n");
-        sb.Append("using System.Collections;\n");
-        sb.Append("using System.Collections.Generic;\n");
-        sb.Append("public class ConfigTable : Singleton<ConfigTable>{\n");
+        try
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("#pragma warning disable 114");
+            sb.AppendLine("using System;");
+            sb.AppendLine("using System.Collections;");
+            sb.AppendLine("using System.Collections.Generic;");
+            sb.AppendLine("using System.Reflection;");
+            sb.AppendLine();
+            sb.AppendLine("public class ConfigTable : Singleton<ConfigTable> {");
 
-        GenConfigTableData(sb);
-        sb.Append("};");
+            GenConfigTableData(sb);
+            sb.AppendLine("}");
 
-        WriteCode(CONFIG_TABLE_DEF_PATH, sb.ToString());
+            WriteCode(CONFIG_TABLE_DEF_PATH, sb.ToString());
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"설정 테이블 생성 실패: {e.Message}");
+            throw;
+        }
     }
 
     private static void GenConfigTableData(StringBuilder sb)
     {
-        sb.AppendLine();
-        var data = Util.LoadFromFile(Path.Combine(LOCAL_CSV_PATH, CONFIG_TABLE_NAME));
-        List<string[]> rows = CSVSerializer.ParseCSV(data, '|');
+        var data = File.ReadAllText(Path.Combine(LOCAL_CSV_PATH, CONFIG_TABLE_NAME));
+        var rows = CSVSerializer.ParseCSV(data, '|');
 
-        Enumerable.Range(2, rows.Count - 2).ToList().ForEach(i =>
+        for (int i = 2; i < rows.Count; i++)
         {
             var name = rows[i][0];
             var type = rows[i][1];
             sb.AppendLine($"\tpublic {type} {name};");
-        });
+        }
 
         sb.AppendLine("\tpublic void LoadConfig(Dictionary<string, Dictionary<string, object>> rowList)");
         sb.AppendLine("\t{");
         sb.AppendLine("\t\tforeach (var rowItem in rowList)");
         sb.AppendLine("\t\t{");
-        sb.AppendLine("\t\t\tvar field = typeof(ConfigTable).GetField(rowItem.Key, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);");
+        sb.AppendLine("\t\t\tvar field = typeof(ConfigTable).GetField(rowItem.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);");
         sb.AppendLine("\t\t\tfield.SetValue(this, rowItem.Value[\"value\"]);");
         sb.AppendLine("\t\t}");
         sb.AppendLine("\t}");
     }
 
-    public static void WriteCode(string filePath, string content)
-    {
-        using (StreamWriter writer = new StreamWriter(filePath, false))
-        {
-            try
-            {
-                writer.WriteLine("{0}", content);
-                Debug.LogWarningFormat("File {0} generated", filePath);
-            }
-            catch (System.Exception ex)
-            {
-                string msg = " threw:\n" + ex.ToString();
-                Debug.LogError(msg);
-            }
-        }
-    }
     public static void GenTableEnum()
     {
-        StringBuilder sb = new StringBuilder();
-        GenTableEnum(sb);
-        WriteCode(TABLE_ENUM_DEF_PATH, sb.ToString());
+        try
+        {
+            StringBuilder sb = new StringBuilder();
+            GenTableEnum(sb);
+            WriteCode(TABLE_ENUM_DEF_PATH, sb.ToString());
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"열거형 테이블 생성 실패: {e.Message}");
+            throw;
+        }
     }
+
     private static void GenTableEnum(StringBuilder sb)
     {
-        var data = Util.LoadFromFile(Path.Combine(LOCAL_CSV_PATH, ENUM_TABLE_NAME));
-        List<string[]> rows = CSVSerializer.ParseCSV(data, '|');
+        var data = File.ReadAllText(Path.Combine(LOCAL_CSV_PATH, ENUM_TABLE_NAME));
+        var rows = CSVSerializer.ParseCSV(data, '|');
 
         HashSet<string> keySet = new HashSet<string>();
 
-        Enumerable.Range(2, rows.Count - 2).ToList().ForEach(i =>
+        for (int i = 2; i < rows.Count; i++)
         {
-            string enumType = rows[i][0].ToString().ToUpper();
+            string enumType = rows[i][0].ToUpper();
             if (!keySet.Contains(enumType))
             {
                 if (keySet.Count > 0)
-                    sb.AppendFormat("}}\n");
-                sb.AppendFormat("public enum {0} \n{{ \n", enumType);
+                    sb.AppendLine("}");
+                sb.AppendLine($"public enum {enumType}");
+                sb.AppendLine("{");
                 keySet.Add(enumType);
             }
 
-            sb.AppendFormat("\t{0, -28} = {1, -10}", rows[i][1].ToString().ToUpper(), rows[i][2] + ",");
-            sb.AppendFormat("\t// {0}", rows[i][3]);
-            sb.AppendLine();
-        });
-        sb.AppendFormat("}}");
+            sb.AppendLine($"\t{rows[i][1].ToUpper(),-28} = {rows[i][2],-10}, // {rows[i][3]}");
+        }
+        sb.AppendLine("}");
+    }
+
+    private static void WriteCode(string filePath, string content)
+    {
+        try
+        {
+            File.WriteAllText(filePath, content);
+            Debug.Log($"파일 생성 완료: {filePath}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"파일 생성 실패 {filePath}: {e.Message}");
+            throw;
+        }
     }
 }

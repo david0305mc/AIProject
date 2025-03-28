@@ -2,8 +2,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-public class ConfigTable : Singleton<ConfigTable>{
+using System.Reflection;
 
+public class ConfigTable : Singleton<ConfigTable>
+{
 	public int maxItemCount;
 	public string test01;
 	public int maxGold;
@@ -22,8 +24,8 @@ public class ConfigTable : Singleton<ConfigTable>{
 	{
 		foreach (var rowItem in rowList)
 		{
-			var field = typeof(ConfigTable).GetField(rowItem.Key, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+			var field = typeof(ConfigTable).GetField(rowItem.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			field.SetValue(this, rowItem.Value["value"]);
 		}
 	}
-};
+}

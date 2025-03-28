@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using UniRx;
+using JetBrains.Annotations;
 
 public class UIIntro : MonoBehaviour
 {
@@ -19,6 +20,10 @@ public class UIIntro : MonoBehaviour
     {
         await DataManager.Instance.LoadDataAsync();
         await DataManager.Instance.LoadConfigTable();
+        foreach (var item in DataManager.Instance.LevelDic)
+        {
+            Debug.Log(item.Key);
+        }
         var mainSceneAsync = SceneManager.LoadSceneAsync("Main");
         await UniTask.WaitUntil(() => mainSceneAsync.isDone);
     }
