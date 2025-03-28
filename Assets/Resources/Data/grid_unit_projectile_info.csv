@@ -1,0 +1,4 @@
+﻿Version|Id|TrajectoryType|FireTime|FireTerm|FireAngle|FireSpeed|ShowRouteTime|Knockback
+string|int|int|int|int|int|int|int|int
+20250110|2001001|1|3|10|360|3|0|0
+20250110|2001002|1|1|10|0|0|0|1

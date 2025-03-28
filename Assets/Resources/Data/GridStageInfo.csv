@@ -1,0 +1,4 @@
+﻿Id|PrefabName|MSConditionType1|MSConditionType2|MSConditionType3|MSConditionType4|MSConditionValue1|MSConditionValue2|MSConditionValue3|MSConditionValue4|MSGroupId1|MSGroupId2|MSGroupId3|MSGroupId4|NextStageId
+int|string|int|int|int|int|int|int|int|int|int|int|int|int|int
+1|StageExample|0|1|1|1|0|50|100|1|1|1|1|1|2
+2|StageExample|0|1|1|1|0|50|100|1|1|1|1|1|3

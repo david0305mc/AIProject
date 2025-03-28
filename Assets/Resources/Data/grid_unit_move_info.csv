@@ -1,0 +1,5 @@
+﻿Version|Id|MoveType|MoveTypeParam|MoveTime|MoveSpeedRate
+string|string|string|string|string|string
+20250110|1001001|1||1000|1000
+20250110|1001002|2||1000|2000
+20250110|1001003|3||2000|3000

@@ -17,6 +17,8 @@ public class UIIntro : MonoBehaviour
 
     private async UniTask StartGame()
     {
+        await DataManager.Instance.LoadDataAsync();
+        await DataManager.Instance.LoadConfigTable();
         var mainSceneAsync = SceneManager.LoadSceneAsync("Main");
         await UniTask.WaitUntil(() => mainSceneAsync.isDone);
     }

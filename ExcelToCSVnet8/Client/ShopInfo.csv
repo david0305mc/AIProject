@@ -1,0 +1,8 @@
+﻿Id|name|PID|rewardType|rewardCount
+int|string|string|item_type|int
+1|a|whatthe_devil_gold_1000|3|5
+2|b|whatthe_devil_gold_1000|3|10
+3|c|whatthe_devil_gold_1000|3|15
+4|d|whatthe_devil_gold_1000|4|20
+5|e|whatthe_devil_gold_1000|4|215
+6|f|whatthe_devil_gold_1000|4|500
