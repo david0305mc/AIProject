@@ -1,0 +1,38 @@
+﻿Id|Memo3|Memo|PrefabName|IsTargetTurn|IsDestroyedByWall|IsMeleeAtk|AtkRate|FixedFireSpeed|FireSpeed|TrajectoryType|TrajectoryParam1|TrajectoryParam2|FireTime|FireTerm|FireAngleType|FireAngle|DestroyTime|ShowRouteTime|Knockback|Airborne|KnockbackDuration|Follow|WallBounceCnt|NextProjectileId|DotDmgId|Pierce
+int|string|string|string|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int
+2001001|몬스터|#N/A||0|0|1|100|0|0|1|||1|0|0|0|5000|0|1000|0|500|0|0|0|0|999
+2001002|몬스터|#N/A|Projectile/3_bud_cute_series_projectile|1|1|0|100|0|7|2|||1|0|0|0|5000|0|0|0|500|0|0|0|0|0
+2001003|몬스터|#N/A|Projectile/4_wolf_pup_projectile|0|0|1|100|0|0|1|||1|0|0|0|5000|0|0|0|500|0|0|0|0|999
+2001004|몬스터|캐릭터를 향해 발사|Projectile/5_snow_bomb_projectile|1|1|0|100|0|7|4|5|5|1|0|0|0|20000|0|0|0|500|0|0|0|0|0
+2001005|몬스터|캐릭터를 향해 발사|Projectile/6_poison_bomb_projectile|1|1|0|100|0|7|1|||3|0|0|0|20000|0|0|0|500|0|0|0|0|0
+9001001|캐릭터|원거리|Projectile/9001001_weapon_projectile|1|1|0|100|0|14|1|||1|0|0|0|20000|0|1000|0|500|0|0|0|0|0
+900100201|캐릭터|근거리|Projectile/9001002_weapon_projectile_1|0|0|1|100|0|0|1|||1|0|0|0|1000|0|2000|0|500|0|0|0|0|999
+900100202|캐릭터|근거리|Projectile/9001002_weapon_projectile_2|0|0|1|100|0|0|1|||1|0|0|0|1000|0|2000|0|500|0|0|0|0|999
+900100203|캐릭터|근거리|Projectile/9001002_weapon_projectile_3|0|0|1|100|0|0|1|||1|0|0|0|1000|0|2000|0|500|0|0|0|0|999
+900100204|캐릭터|근거리|Projectile/9001002_weapon_projectile_4|0|0|1|100|0|0|1|||1|0|0|0|1000|0|2000|0|500|0|0|0|0|999
+20200101|보스|#N/A|Projectile/7_snake_cute_small_projectile|1|1|0|100|0|5|3|1|1|3|0|2|120|5000|0|0|0|500|0|0|0|0|0
+20200102|보스|#N/A|Projectile/7_snake_cute_small_projectile|1|1|0|100|0|7|1|||3|0|2|120|5000|0|0|0|500|0|0|20200101|0|0
+20200103|보스|#N/A|Projectile/7_snake_cute_big_projectile|1|1|0|100|0|7|1|||10|0|2|360|10000|0|0|0|500|0|2|0|0|0
+20200201|보스|손톱 공격 ( 한갈래 x 3 회 )|Projectile/8_were_slash_projectile|1|1|0|100|0|7|1|||3|1|0|0|5000|0|0|0|500|0|0|0|0|0
+20200202|보스|발사 (30갈래)|Projectile/8_were_ice_projectile|1|1|0|100|0|12|1|||30|0|2|360|10000|0|0|0|500|0|1|0|0|0
+30001|소환수|불 정령|Projectile/7_snake_cute_small_projectile|1|1|0|100|0|7|1|||1|0|0|0|10000|0|0|0|500|0|0|0|0|0
+30002|소환수|얼음 정령|Projectile/5_snow_bomb_projectile|1|1|0|100|0|7|4|5|5|1|0|0|0|10000|0|0|0|500|0|0|0|0|0
+30003|소환수|레이저|Projectile/projectileTest02|0|0|1|100|0|0|5|||1|0|0|0|5000|0|0|0|500|0|0|0|0|999
+99999999|테스트|랜덤공격 테스트|Projectile/projectileTest|0|0|1|100|0|0|6|||1|0|0|0|5000|0|0|0|500|0|0|0|0|999
+99999990|테스트|레이저|Projectile/projectileTest02|0|0|1|100|0|0|5|||1|0|0|0|5000|0|0|0|500|0|0|0|0|999
+100201|몬스터|칼 공격|Projectile/Skeleton_Sword_Projectile|0|0|1|100|0|6|1|||1|0|0|0|1000|0|0|0|500|0|0|0|0|999
+100301|몬스터|메이지|Projectile/3_bud_cute_series_projectile|0|1|0|50|0|7|1|||1|0|0|0|5000|0|0|0|500|0|0|0|0|0
+100401|몬스터|대검 공격|Projectile/Skeleton_Warrior_Projectile|0|0|1|100|0|6|1|||1|0|0|0|1000|0|0|0|500|0|0|0|0|999
+200101|보스 1|패턴 1-1. 불 구슬 발사 (벽에 튕김)|Projectile/Boss/Boss_1_Fire_Projectile|1|1|0|50|0|10|1|||1|0|0|0|10000|0|3000|0|500|0|1|0|0|0
+200102|보스 1|패턴 1-2. 불 구슬 촤르륵 발사 (벽에 안튕김) 360도 20발|Projectile/Boss/Boss_1_Fire_Projectile|1|1|0|100|0|10|1|||30|50|2|360|10000|0|3000|0|500|0|1|0|0|0
+200103|보스 1|패턴 3. 파이어 토네이도 4방향 발사|Projectile/Boss/Boss_1_Tornado_Projectile|0|1|0|100|0|6|1|||4|0|2|360|10000|0|500|5000|1200|0|0|0|0|0
+200104|보스 1|패턴 4. 랜덤 위치 폭발 4 개 / 바닥에 닿으면 데미지 받는 총알 생성 ( 5초 유지 ) ( 딜레이 0.5초 - 5번 )|Projectile/Boss/Boss_1_Explosion_Projectile|0|0|0|100|0|0|6|||15|500|0|0|10000|0|0|0|500|0|0|0|0|0
+4001|오브젝트|함정 공격||0|0|1|100|0|0|1|||0|0|0|0|10000|0|4000|0|500|0|0|0|0|999
+5001|어빌리티|대쉬 후 랜덤 공격|Projectile/Sword_Projectile|1|1|0|100|0|11|1|||1|0|0|0|5000|0|0|0|500|0|0|0|0|999
+5002|어빌리티|대쉬하며 칼질하는 공격|Projectile/Dash_Atk_Projectile|0|0|1|100|0|0|1|||1|0|0|0|1000|0|0|0|500|0|0|0|0|999
+5003|어빌리티|랜덤 얼음 스트라이크|Projectile/Frozen_Sword_Projectile|0|0|1|100|1|0|6|||1|0|0|0|3000|0|0|0|500|0|0|0|0|999
+5004|어빌리티|번개 후속타|Projectile/Lightning_Vertical_Projectile|0|0|1|30|1|0|1|||1|0|0|0|1000|0|0|0|500|0|0|0|0|999
+5005|어빌리티|레이저 정령||1|1||100|1|||||||||||||500|||||
+5006|어빌리티|프로즌 어스퀘이크||1|1||100|1|||||||||||||500|||||
+5007|어빌리티|에너지 블라스트|Projectile/Energy_Blast_Projectile|0|0|1|30|1|0|1|||1|0|0|0|1000|0|3000|0|500|0|0|0|0|999
+5008|어빌리티|라이트닝 링|Projectile/Lightning_Ring_Projectile|0|0|1|200|1|0|1|||1|0|0|0|1000|0|0|0|500|0|0|0|0|999

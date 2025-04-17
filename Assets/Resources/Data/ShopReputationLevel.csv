@@ -1,0 +1,12 @@
+﻿Id|Level|ReputationScore|RewardType1|RewardId1|RewardCnt1|RewardType2|RewardId2|RewardCnt2|RewardType3|RewardId3|RewardCnt3|RewardType4|RewardId4|RewardCnt4|RewardType5|RewardId5|RewardCnt5
+int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int|int
+1|1|10|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+2|2|20|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+3|3|30|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+4|4|40|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+5|5|50|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+6|6|60|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+7|7|70|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+8|8|80|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+9|9|90|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0
+10|10|100|1|0|1000|3|0|100|0|0|0|0|0|0|0|0|0

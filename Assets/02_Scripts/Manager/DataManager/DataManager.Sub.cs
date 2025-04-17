@@ -10,15 +10,6 @@ public partial class DataManager
 
     }
 
-    public GridStageInfo GetGridStageInfo(int _id)
-    {
-        return GridstageinfoArray.Single(r => r.id == _id);
-    }
-
-    public List<GridStageMSGroup> GetGridStageMSGroups(int _groupId)
-    {
-        return GridstagemsgroupArray.Where(r => r.groupid == _groupId).ToList();
-    }
 
     //public int MaxStage()
     //{

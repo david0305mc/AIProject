@@ -21,12 +21,13 @@ public enum UNIT_TYPE
 }
 public enum ITEM_TYPE
 {
-	UNIT                         = 0         , // 조각
-	SOUL                         = 1         , // 영혼 아이템 (재화)
-	EXP                          = 2         , // 경험치
-	STAMINA                      = 3         , // 스태미나
-	GOLD                         = 4         , // 골드
-	ADFREE                       = 5         , // adfree
+	GOLD                         = 1         , // 골드
+	GEM                          = 3         , // 보석
+	DUNGEONITEM                  = 4         , // 던전 아이템
+	REPUTATION                   = 5         , // 평판수치
+	EQUIPITEM                    = 10        , // 장비
+	CHARACTER                    = 20        , // 캐릭터
+	DUNGEONHEART                 = 101       , // 던전하트
 }
 public enum RARITY_TYPE
 {
@@ -55,23 +56,83 @@ public enum TUTO_TYPE
 	NEEDTOUCH                    = 3         , // 
 	ATTENDANCE                   = 4         , // 
 }
-public enum EVENT_TYPE
+public enum MAP_EVENT_TYPE
 {
 	SPAWN                        = 0         , // 스폰 이벤트
 	NEXTSTAGE                    = 1         , // 다음스테이지 이벤트
 	STORY                        = 2         , // 이야기진행 이벤트
-	DAMAGE                       = 3         , // 데미지 이벤트
+	BOX                          = 3         , // 
 }
-public enum SPAWN_TYPE
+public enum ACTION_TYPE
 {
-	STAGE_ENTRY_SPAWN            = 0         , // 스테이지 진입 스폰
-	KILL_MONSTER_SPAWN           = 1         , // 몬스터 처치 스폰
+	MOVE                         = 1001      , // 
+	ATTACK                       = 2001      , // 
+	TACKLE                       = 2002      , // 
+	SUMMON                       = 3001      , // 
 }
-public enum SPAWN_TARGET
+public enum MOVE_TYPE
 {
-	USER                         = 0         , // 유저
-	ENEMY                        = 1         , // 적
-	ENTITY                       = 2         , // 대상(파괴가능 오브젝트등)
-	NPC                          = 3         , // 상호작용 NPC
-	REWARD                       = 4         , // 보상(획득가능한 재화나 아이템등)
+	STOP                         = 1         , // 
+	RANDOMMOVE                   = 2         , // 
+	EXITMOVE                     = 3         , // 
+}
+public enum ATTRIBUTE_TYPE
+{
+	ATK                          = 1         , // 
+	ATKSPEED                     = 2         , // 
+	HP                           = 3         , // 
+	MOVESPEED                    = 4         , // 
+	DEF                          = 5         , // 
+	CRITICALCHANCE               = 6         , // 
+	CRITICALATK                  = 7         , // 
+	PROJECTILESCALE              = 8         , // 
+	PROJECTILESPEED              = 9         , // 
+	DODGEMAX                     = 10        , // 
+	DODGECHARGETIME              = 11        , // 
+	HPRECOVERY                   = 12        , // 
+	EVASION                      = 13        , // 
+	INVINCIBLE                   = 14        , // 
+	HITFREEZE                    = 50        , // 
+	HITMOVESPEED                 = 51        , // 
+	MULTISHOT                    = 100       , // 
+	BOUNCESHOT                   = 101       , // 
+	DOTDMG                       = 102       , // 
+	PIERCE                       = 103       , // 
+	TRACKING                     = 104       , // 
+	DOUBLESHOT                   = 105       , // 
+	DIAGONALSHOT                 = 106       , // 
+	EXTRAFIRE                    = 107       , // 
+	WALLBOUNCESHOT               = 108       , // 
+	RANDOMATTACK                 = 109       , // 
+	SUMMONOBJ                    = 200       , // 
+	SECONDPROJECTILE             = 201       , // 
+	DASHPROJECTILE               = 202       , // 
+	FIREPROJECTILE               = 203       , // 
+}
+public enum EQUIPMENT_TYPE
+{
+	WEAPON                       = 1         , // 
+	HELMET                       = 2         , // 
+	ARMOR                        = 3         , // 
+	NECKLACE                     = 4         , // 
+	RING                         = 5         , // 
+	BOOTS                        = 6         , // 
+}
+public enum DUNGEON_EVENT_TYPE
+{
+	DIALOG                       = 1         , // 
+	BATTLE                       = 2         , // 
+	BUFF                         = 3         , // 
+}
+public enum ABILITY_CONDITION_TYPE
+{
+	NONE                         = 0         , // 
+	HPCHECK                      = 1         , // 
+	TIMER                        = 2         , // 
+	KILLENEMY                    = 3         , // 
+}
+public enum OBJECT_TYPE
+{
+	NORMAL                       = 1         , // 
+	TRAP                         = 2         , // 
 }

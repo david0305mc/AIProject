@@ -4,8 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-public class ConfigTable : Singleton<ConfigTable>
-{
+public class ConfigTable : Singleton<ConfigTable> {
 	public int maxItemCount;
 	public string test01;
 	public int maxGold;

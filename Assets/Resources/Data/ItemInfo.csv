@@ -1,0 +1,9 @@
+﻿ID|ItemType|ItemName|ItemDesc|IconName
+int|item_type|string|string|string
+1|1|item_name_gold||Icon_Soul
+2|3|item_name_gem||Icon_Stamina
+3|4|||Tab_Icon_04
+4|5|item_name_reputation||function_icon_emoji_smile
+5|10|||shop_box_1
+6|20|||Icon_Kill_Count
+7|101|||Heart

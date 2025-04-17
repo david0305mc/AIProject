@@ -1,0 +1,5 @@
+﻿Id|PrefabName|Memo|ProjectileId|AtkRate|Delay
+int|string|string|int|int|int
+1|Summon/ability_summon_fire_fairy|불요정|30001|50|1000
+2|Summon/ability_summon_frozen_fairy|얼음요정|30002|50|1000
+3|Summon/ability_summon_lightning_fairy|번개요정|30003|50|1000

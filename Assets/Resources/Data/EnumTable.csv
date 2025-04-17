@@ -9,12 +9,13 @@ slot_anim_type|Active|1|활성화 됨|||
 slot_anim_type|UnActive|2|비활성화 됨|||
 unit_type|tanker|0|탱커|||
 unit_type|archer|1|궁수|||
-item_type|unit|0|조각|||
-item_type|soul|1|영혼 아이템 (재화)|||
-item_type|exp|2|경험치|||
-item_type|stamina|3|스태미나|||
-item_type|gold|4|골드|||
-item_type|adfree|5|adfree|||
+item_type|gold|1|골드|||
+item_type|gem|3|보석|||
+item_type|dungeonItem|4|던전 아이템|||
+item_type|Reputation|5|평판수치|||
+item_type|equipItem|10|장비|||
+item_type|character|20|캐릭터|||
+item_type|dungeonHeart|101|던전하트|||
 rarity_type|common|0||||
 rarity_type|rare|1||||
 rarity_type|epic|2||||
@@ -33,14 +34,59 @@ tuto_type|dialouge|1||||
 tuto_type|cameraStageMove|2||||
 tuto_type|needTouch|3||||
 tuto_type|attendance|4||||
-event_type|spawn|0|스폰 이벤트|||
-event_type|nextstage|1|다음스테이지 이벤트|||
-event_type|story|2|이야기진행 이벤트|||
-event_type|damage|3|데미지 이벤트|||
-spawn_type|stage_entry_spawn|0|스테이지 진입 스폰|||
-spawn_type|kill_monster_spawn|1|몬스터 처치 스폰|||
-spawn_target|user|0|유저|||
-spawn_target|enemy|1|적|||
-spawn_target|entity|2|대상(파괴가능 오브젝트등)|||
-spawn_target|npc|3|상호작용 NPC|||
-spawn_target|reward|4|보상(획득가능한 재화나 아이템등)|||
+map_event_type|spawn|0|스폰 이벤트|||
+map_event_type|nextstage|1|다음스테이지 이벤트|||
+map_event_type|story|2|이야기진행 이벤트|||
+map_event_type|box|3||||
+action_type|move|1001||||
+action_type|attack|2001||||
+action_type|tackle|2002||||
+action_type|summon|3001||||
+move_type|stop|1||||
+move_type|randomMove|2||||
+move_type|exitMove|3||||
+attribute_type|atk|1||||
+attribute_type|atkSpeed|2||||
+attribute_type|hp|3||||
+attribute_type|moveSpeed|4||||
+attribute_type|def|5||||
+attribute_type|criticalChance|6||||
+attribute_type|CriticalAtk|7||||
+attribute_type|projectileScale|8||||
+attribute_type|projectileSpeed|9||||
+attribute_type|dodgeMax|10||||
+attribute_type|dodgeChargeTime|11||||
+attribute_type|hpRecovery|12||||
+attribute_type|evasion|13||||
+attribute_type|invincible|14||||
+attribute_type|hitFreeze|50||||
+attribute_type|hitMoveSpeed|51||||
+attribute_type|multiShot|100||||
+attribute_type|bounceShot|101||||
+attribute_type|dotDmg|102||||
+attribute_type|pierce|103||||
+attribute_type|tracking|104||||
+attribute_type|doubleShot|105||||
+attribute_type|diagonalShot|106||||
+attribute_type|extraFire|107||||
+attribute_type|wallBounceShot|108||||
+attribute_type|randomAttack|109||||
+attribute_type|summonObj|200||||
+attribute_type|secondProjectile|201||||
+attribute_type|dashProjectile|202||||
+attribute_type|fireProjectile|203||||
+equipment_type|weapon|1||||
+equipment_type|helmet|2||||
+equipment_type|armor|3||||
+equipment_type|necklace|4||||
+equipment_type|ring|5||||
+equipment_type|boots|6||||
+dungeon_event_type|dialog|1||||
+dungeon_event_type|battle|2||||
+dungeon_event_type|buff|3||||
+ability_condition_type|none|0||||
+ability_condition_type|hpCheck|1||||
+ability_condition_type|timer|2||||
+ability_condition_type|killEnemy|3||||
+object_type|normal|1||||
+object_type|trap|2||||

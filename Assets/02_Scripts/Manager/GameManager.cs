@@ -1,33 +1,29 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Lean.Pool;
 
 public class GameManager : SingletonMono<GameManager>
 {
     [SerializeField] private EnemyObj enemyObjPrefab;
 
     private Dictionary<long, EnemyObj> enemyDic = new Dictionary<long, EnemyObj>();
-
     public void SpawnEnemy(Vector3? spawnPos = null)
     {
         var enemyData = UserDataManager.Instance.AddEnemy();
-
-        Vector3 position = spawnPos ?? GetRandomSpawnPosition();
-        EnemyObj enemyObj = Lean.Pool.LeanPool.Spawn(enemyObjPrefab, position, Quaternion.identity, transform);
-
+        EnemyObj enemyObj = LeanPool.Spawn(enemyObjPrefab, spawnPos ?? Vector3.zero, Quaternion.identity, transform);
         enemyObj.InitObj(enemyData);
+
         enemyObj.AttackEvent = () =>
         {
-            UserDataManager.Instance.HitToPlayer(enemyData.UID);
+            UserDataManager.Instance.HitToPlayer(enemyData.UID); // 플레이어 피격
         };
 
-        if (enemyDic.ContainsKey(enemyData.UID))
+        enemyObj.OnDead = (uid) =>
         {
-            Debug.LogWarning($"[GameManager] Duplicate UID: {enemyData.UID} already exists.");
-        }
-        else
-        {
-            enemyDic.Add(enemyData.UID, enemyObj);
-        }
+            DespawnEnemy(uid);
+        };
+
+        enemyDic[enemyData.UID] = enemyObj;
     }
 
     public void DespawnEnemy(long uid)

@@ -1,0 +1,4 @@
+﻿Id|TackleType|TackleSpeed|BrakeDist
+int|int|int|int
+100101|2|2|0
+2002001|1|6|10

@@ -1,0 +1,4 @@
+﻿Id|MoveType|MoveTypeParam|MoveValue|MoveSpeedRate
+int|move_type|int|int|int
+1001001|1||5|0
+1001002|2||3|500

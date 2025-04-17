@@ -1,0 +1,10 @@
+﻿Id|EventType|DialogGroup|StartDesc|PositiveResult|NegativeResult|Weight
+int|Dungeon_event_type|int|string|string|string|int
+1|1|9999|아무일도 없었다.|||100
+2|1|9999|빛 하나 없는 방|||100
+3|1|9999|집으로 가고 싶다.|||100
+4|1|9999|깜깜한 어둠 속|||100
+5|2|2000|몬스터와 마주쳤다.|전투에서 승리했다.||100
+6|2|2000|불량배와 마주쳤다.|마침내 승리했다.||100
+7|3|3000|커다란 산삼을 먹었다.|||100
+8|3|3001|더러운 웅덩이를 밟았다.|||100

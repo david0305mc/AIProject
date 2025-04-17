@@ -10,16 +10,8 @@ public enum UnitStates
 {
     Spawning,
     Idle,
-    Approach,
-    Dodge,
-    StopMove,
-    RandomMove,
+    Move,
     Attack,
-    Tackle,
-    Headbutt,
-    Summon,
-    TackleExtraMove,
-    KnockBack,
-    Dead,
-    Win,
+    Hit,
+    Die
 }

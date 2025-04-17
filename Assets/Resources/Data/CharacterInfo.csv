@@ -1,0 +1,5 @@
+﻿Id|Icon|PrefabName|Name|Damage|MoveSpeed|Hp|Defense
+int|string|string|string|int|int|int|int
+1|||캐릭터1|50|5|500|100
+2|||캐릭터2|50|5|500|100
+3|||캐릭터3|50|5|500|100

@@ -1,0 +1,7 @@
+﻿ID|WeaponGroup|Order|Fmemo|AnimName|ProjectileId|Cooltime
+int|int|int|string|string|int|int
+100|10001|1|원거리|Magic_Atk_1|9001001|0
+200|11001|1|근거리|Sword_Atk_1|900100201|0
+201|11001|2|근거리|Sword_Atk_2|900100202|0
+202|11001|3|근거리|Sword_Atk_3|900100203|0
+203|11001|4|근거리|Sword_Atk_4|900100204|0

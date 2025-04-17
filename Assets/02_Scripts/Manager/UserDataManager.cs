@@ -30,9 +30,9 @@ public class UserDataManager : Singleton<UserDataManager>
         };
     }
 
-    public UnitBaseData AddEnemy(int hp = 50, int attackPower = 20)
+    public EnemyData AddEnemy(int hp = 50, int attackPower = 20)
     {
-        var data = new UnitBaseData()
+        var data = new EnemyData()
         {
             UID = GenerateUID(),
             HP = hp,

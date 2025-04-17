@@ -1,0 +1,7 @@
+﻿Id|AttributeType|AttributeValue|AttributeDesc|Weight|DialogGroup
+int|attribute_type|int|string|int|int
+1|1|10|공격력10%|100|3000
+2|4|15|이동속도15%|100|3000
+3|5|20|방어력20%|100|3000
+4|6|-10|크리티컬 확률-10%|100|3001
+5|7|-20|크리티컬 데미지-20%|100|3001

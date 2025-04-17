@@ -1,0 +1,9 @@
+﻿ID|Grade|Icon|Memo|Memo2|PrefabName|EquipmentType|EffectId|WeaponType|ProjectileId|AtkSpeed|AtkRange|DashRange|MergeId|AttributeType|AttributeValue|AttributeDesc
+int|int|string|string|string|string|equipment_type|int|int|int|int|int|int|int|attribute_type|int|string
+10001|1|icon_equip_arrow|원거리|공격력증가|Weapon/Weapon_1|1|0|2|9001001|1|20000|10000|11001|0|0|없음
+11001|1|com_icon_equip_sword|근거리|공격력증가|Weapon/Weapon_2|1|0|1|9001002|1|1500|3500|10001|0|0|없음
+20001|1|com_icon_equip_hat|투구|체력 증가||2|0|0|2001001|1|||30001|1|10|체력 +10%
+30001|1|com_icon_equip_armor|옷|체력 증가||3|0|0|0|1|||20001|1|10|체력 +10%
+40001|1|com_icon_equip_shield|목걸이|공격력증가||4|0|0|0|1|||50001|1|10|체력 +10%
+50001|1|com_icon_equip_ring|반지|공격력증가||5|0|0|0|1|||40001|1|10|체력 +10%
+60001|1|com_icon_equip_shoes|신발|체력 증가||6|0|0|0|1|||50001|1|10|체력 +10%

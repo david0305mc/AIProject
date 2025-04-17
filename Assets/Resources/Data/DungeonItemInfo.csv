@@ -1,0 +1,7 @@
+﻿Id|Grade|Name|IconName|SellRewardType|SellRewardId|SellRewardCnt
+int|int|string|string|int|int|int
+40001|1|슬라임 액체|dungeon_item_1|1|0|10
+40002|1|작은 뼈|dungeon_item_2|1|0|10
+40003|2|찣어진 종이|dungeon_item_3|1|0|10
+40004|2|커다란 뼈|dungeon_item_4|1|0|10
+40005|3|화염구|dungeon_item_5|1|0|10

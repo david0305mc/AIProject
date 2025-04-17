@@ -1,0 +1,4 @@
+﻿Id|ObjectType|PrefabName|Atk|Hp|DropGroup|ProjectileID
+int|object_type|string|int|int|int|int
+1|2|Thorn_Trap|1|0|0|4001
+2|1||0|1|1|0
