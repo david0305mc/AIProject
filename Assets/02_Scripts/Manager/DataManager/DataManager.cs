@@ -60,12 +60,7 @@ public partial class DataManager : Singleton<DataManager>
 
             try
             {
-                string data;
-#if !DEV
-                data = Resources.Load<TextAsset>(Path.Combine("Data", tableName))?.text;
-#else
-				data = await Util.LoadFromFileAsync(Path.Combine(LOCAL_CSV_PATH, $"{tableName}.csv"));
-#endif
+                string data = await LoadTableDataAsync(tableName);
 
                 if (string.IsNullOrEmpty(data))
                 {
@@ -186,6 +181,15 @@ public partial class DataManager : Singleton<DataManager>
             Debug.LogError($"CSV 역직렬화 실패: {e.Message}");
             throw;
         }
+    }
+    public async UniTask<string> LoadTableDataAsync(string tableName)
+    {
+#if DEV
+        string path = Path.Combine(LOCAL_CSV_PATH, $"{tableName}.csv");
+        return await Util.LoadFromFileAsync(path);
+#else
+        return Resources.Load<TextAsset>(Path.Combine("Data", tableName))?.text;
+#endif
     }
 }
 
