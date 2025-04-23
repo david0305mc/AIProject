@@ -17,11 +17,14 @@ public class BaseData
 public class UserDataManager : Singleton<UserDataManager>
 {
     public BaseData BaseData { get; set; }
-    private static readonly string LocalFilePath = Path.Combine(Application.persistentDataPath, "SaveData");
 
     public long GenerateUID()
     {
         return BaseData.GetNextUID();
+    }
+    public static string GenerateUserUID()
+    {
+        return System.Guid.NewGuid().ToString();
     }
 
     // 플레이어 및 적 데이터 관리
@@ -34,6 +37,10 @@ public class UserDataManager : Singleton<UserDataManager>
     protected override void init()
     {
         base.init();
+    }
+    private static string GetUserSaveFilePath(string userUID)
+    {
+        return Path.Combine(Application.persistentDataPath, $"SaveData_{userUID}");
     }
     public void GeneratePlayerData()
     {
@@ -87,7 +94,7 @@ public class UserDataManager : Singleton<UserDataManager>
         {
             string saveData = JsonUtility.ToJson(BaseData);
             // saveData = Utill.EncryptXOR(saveData);
-            Util.SaveFile(LocalFilePath, saveData);
+            Util.SaveFile(GetUserSaveFilePath(BaseData.userUID), saveData);
         }
         catch (System.Exception e)
         {
@@ -95,7 +102,7 @@ public class UserDataManager : Singleton<UserDataManager>
         }
     }
 
-    public async UniTask LoadLocalDataAsync(string uid)
+    public async UniTask LoadUserOrCreateNewAsync(string uid)
     {
         bool loaded = TryLoadLocalData(uid);
         if (!loaded)
@@ -107,11 +114,12 @@ public class UserDataManager : Singleton<UserDataManager>
     }
     private bool TryLoadLocalData(string uid)
     {
-        if (!File.Exists(LocalFilePath))
+        string filePath = GetUserSaveFilePath(uid);
+        if (!File.Exists(filePath))
             return false;
         try
         {
-            string json = Util.LoadFromFile(LocalFilePath);
+            string json = Util.LoadFromFile(filePath);
             var loaded = JsonUtility.FromJson<BaseData>(json);
 
             if (loaded == null || string.IsNullOrEmpty(loaded.userUID))
