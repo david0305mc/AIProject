@@ -1,12 +1,27 @@
+using System.IO;
+using Cysharp.Threading.Tasks;
+using UniRx;
 using UnityEngine;
 
+public class BaseData
+{
+    public long uidSeed;
+    public long dbVersion;
+    public string userUID;
+
+    public long GetNextUID()
+    {
+        return uidSeed++;
+    }
+}
 public class UserDataManager : Singleton<UserDataManager>
 {
-    private long UIDSeed;
+    public BaseData BaseData { get; set; }
+    private static readonly string LocalFilePath = Path.Combine(Application.persistentDataPath, "SaveData");
 
     public long GenerateUID()
     {
-        return UIDSeed++;
+        return BaseData.GetNextUID();
     }
 
     // 플레이어 및 적 데이터 관리
@@ -19,9 +34,9 @@ public class UserDataManager : Singleton<UserDataManager>
     protected override void init()
     {
         base.init();
-        UIDSeed = 0;
-
-        // 초기 PlayerData 생성
+    }
+    public void GeneratePlayerData()
+    {
         playerData = new UnitBaseData()
         {
             UID = GenerateUID(),
@@ -58,5 +73,77 @@ public class UserDataManager : Singleton<UserDataManager>
     public void ClearEnemies()
     {
         enemyDic.Clear();
+    }
+    public async UniTask SaveLocalDataAsync(bool updateVersion = true)
+    {
+        await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
+
+        if (updateVersion)
+        {
+            // BaseData.dbVersion = GameTime.Get();
+        }
+
+        try
+        {
+            string saveData = JsonUtility.ToJson(BaseData);
+            // saveData = Utill.EncryptXOR(saveData);
+            Util.SaveFile(LocalFilePath, saveData);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[UserDataManager] 로컬 저장 실패: {e.Message}");
+        }
+    }
+
+    public async UniTask LoadLocalDataAsync(string uid)
+    {
+        bool loaded = TryLoadLocalData(uid);
+        if (!loaded)
+        {
+            await CreateNewUserAsync(uid);
+        }
+
+        Debug.Log($"[UserDataManager] 로컬 데이터 불러오기 완료 - UID: {BaseData.userUID}");
+    }
+    private bool TryLoadLocalData(string uid)
+    {
+        if (!File.Exists(LocalFilePath))
+            return false;
+        try
+        {
+            string json = Util.LoadFromFile(LocalFilePath);
+            var loaded = JsonUtility.FromJson<BaseData>(json);
+
+            if (loaded == null || string.IsNullOrEmpty(loaded.userUID))
+            {
+                Debug.LogWarning("[UserDataManager] 잘못된 저장 데이터");
+                return false;
+            }
+
+            if (loaded.userUID != uid)
+                return false;
+
+            BaseData = Util.MergeFields(new BaseData(), loaded);
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[UserDataManager] 로컬 데이터 로딩 실패: {e.Message}");
+            return false;
+        }
+    }
+
+    public async UniTask CreateNewUserAsync(string _uid)
+    {
+        InitData();
+        BaseData.userUID = _uid;
+        GeneratePlayerData(); // 여기서 명시적 호출
+        await SaveLocalDataAsync(false);
+    }
+    public void InitData()
+    {
+        BaseData = new BaseData();
+        enemyDic.Clear();
+        playerData = null;
     }
 }
