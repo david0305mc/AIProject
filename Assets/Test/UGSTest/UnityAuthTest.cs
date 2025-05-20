@@ -1,19 +1,26 @@
 using UnityEngine;
-using Unity.Services.Core;
 using System;
-using Unity.Services.Authentication;
 using Cysharp.Threading.Tasks;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using Unity.Services.CloudSave;
+using UniRx;
+using Unity.Services.Authentication;
 public class UnityAuthTest : MonoBehaviour
 {
     [SerializeField] TMP_InputField idInputField;
     [SerializeField] TMP_InputField passwordInputField;
 
+    [SerializeField] TextMeshProUGUI PlayerIDText;
+
     [SerializeField] Button signUpButton;
     [SerializeField] Button signInButton;
+
+    [SerializeField] Button signInGPGS;
+    [SerializeField] Button linkGPGS;
+    [SerializeField] Button unLinkGPGS;
+    [SerializeField] Button guestLogin;
 
     [SerializeField] Button saveButton;
     [SerializeField] Button loadButton;
@@ -22,13 +29,30 @@ public class UnityAuthTest : MonoBehaviour
     {
         try
         {
-            await UnityServices.InitializeAsync();
-            SetupEvents();
+            await AuthManager.Instance.InitializeAsync();
+            AuthManager.Instance.InitGPGS();
+            await AuthManager.Instance.SignInCachedUserAsync();
         }
         catch (Exception e)
         {
             Debug.LogException(e);
         }
+
+        Observable.CombineLatest(AuthManager.Instance.IsGPGSSignIned, AuthManager.Instance.IsGuestSignIned, (isGPGS, isGuest) => new { isGPGS, isGuest })
+        .Subscribe(status =>
+        {
+            // GPGS에 로그인했을 경우
+            guestLogin.gameObject.SetActive(!status.isGPGS && !status.isGuest);
+            signInGPGS.gameObject.SetActive(!status.isGPGS && !status.isGuest);
+            linkGPGS.gameObject.SetActive(status.isGuest && !status.isGPGS); // 익명 로그인 중일 때만 연동 가능
+            unLinkGPGS.gameObject.SetActive(status.isGPGS); // GPGS 로그인된 상태에서만 해제 가능
+        })
+        .AddTo(this); // 또는 gameObject
+
+        AuthManager.Instance.PlayerID.Subscribe(id =>
+        {
+            PlayerIDText.SetText(id);
+        }).AddTo(gameObject);
 
         signUpButton.onClick.AddListener(async () =>
         {
@@ -42,7 +66,7 @@ public class UnityAuthTest : MonoBehaviour
                 Debug.LogError("password must > 4");
                 return;
             }
-            await SignUpWithUsernamePasswordAsync(idInputField.text, passwordInputField.text);
+            await AuthManager.Instance.SignUpWithUsernamePasswordAsync(idInputField.text, passwordInputField.text);
         });
         signInButton.onClick.AddListener(async () =>
         {
@@ -56,8 +80,71 @@ public class UnityAuthTest : MonoBehaviour
                 Debug.LogError("password must > 4");
                 return;
             }
-            await SignInWithUsernamePasswordAsync(idInputField.text, passwordInputField.text);
+            await AuthManager.Instance.SignInWithUsernamePasswordAsync(idInputField.text, passwordInputField.text);
         });
+
+        signInGPGS.onClick.AddListener(async () =>
+        {
+            if (AuthManager.Instance.IsGPGSSignIned.Value)
+            {
+                Debug.LogWarning("이미 로그인되어 있습니다.");
+                return;
+            }
+            signInGPGS.interactable = false;
+            try
+            {
+                string code = await AuthManager.Instance.LoginGooglePlayGames();
+                if (!string.IsNullOrEmpty(code))
+                {
+                    await AuthManager.Instance.SignInWithGooglePlayGamesAsync(code);
+                }
+                else
+                {
+                    Debug.LogWarning("Google Play Games login failed or was canceled.");
+                }
+            }
+            finally
+            {
+                signInGPGS.interactable = true;
+            }
+
+        });
+
+        linkGPGS.onClick.AddListener(async () =>
+        {
+            if (AuthManager.Instance.IsGPGSSignIned.Value)
+            {
+                Debug.LogWarning("이미 로그인되어 있습니다.");
+                return;
+            }
+            try
+            {
+                linkGPGS.interactable = false;
+                string code = await AuthManager.Instance.LoginGooglePlayGames();
+                if (!string.IsNullOrEmpty(code))
+                {
+                    await AuthManager.Instance.LinkWithGooglePlayGamesAsync(code);
+                }
+                else
+                {
+                    Debug.LogWarning("Google Play Games login failed or was canceled.");
+                }
+            }
+            finally
+            {
+                linkGPGS.interactable = true;
+            }
+        });
+        guestLogin.onClick.AddListener(async () =>
+        {
+            await AuthManager.Instance.SignInAnonymouslyAsync();
+        });
+
+        unLinkGPGS.onClick.AddListener(async () =>
+        {
+            await AuthManager.Instance.UnlinkGooglePlayGamesAsync();
+        });
+
         saveButton.onClick.AddListener(() =>
         {
             SaveSomeData();
@@ -68,98 +155,6 @@ public class UnityAuthTest : MonoBehaviour
         });
     }
 
-    async UniTask SignUpWithUsernamePasswordAsync(string username, string password)
-    {
-        try
-        {
-            await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(username, password);
-            Debug.Log("SignUp is successful.");
-        }
-        catch (AuthenticationException ex)
-        {
-            // Compare error code to AuthenticationErrorCodes
-            // Notify the player with the proper error message
-            Debug.LogException(ex);
-        }
-        catch (RequestFailedException ex)
-        {
-            // Compare error code to CommonErrorCodes
-            // Notify the player with the proper error message
-            Debug.LogException(ex);
-        }
-    }
-    async UniTask SignInWithUsernamePasswordAsync(string username, string password)
-    {
-        try
-        {
-            await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username, password);
-            Debug.Log("SignIn is successful.");
-        }
-        catch (AuthenticationException ex)
-        {
-            // Compare error code to AuthenticationErrorCodes
-            // Notify the player with the proper error message
-            Debug.LogException(ex);
-        }
-        catch (RequestFailedException ex)
-        {
-            // Compare error code to CommonErrorCodes
-            // Notify the player with the proper error message
-            Debug.LogException(ex);
-        }
-    }
-    async UniTask SignInAnonymouslyAsync()
-    {
-        try
-        {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            Debug.Log("Sign in anonymously succeeded!");
-
-            // Shows how to get the playerID
-            Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
-
-        }
-        catch (AuthenticationException ex)
-        {
-            // Compare error code to AuthenticationErrorCodes
-            // Notify the player with the proper error message
-            Debug.LogException(ex);
-        }
-        catch (RequestFailedException ex)
-        {
-            // Compare error code to CommonErrorCodes
-            // Notify the player with the proper error message
-            Debug.LogException(ex);
-        }
-    }
-    // Setup authentication event handlers if desired
-    void SetupEvents()
-    {
-        AuthenticationService.Instance.SignedIn += () =>
-        {
-            // Shows how to get a playerID
-            Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
-
-            // Shows how to get an access token
-            Debug.Log($"Access Token: {AuthenticationService.Instance.AccessToken}");
-
-        };
-
-        AuthenticationService.Instance.SignInFailed += (err) =>
-        {
-            Debug.LogError(err);
-        };
-
-        AuthenticationService.Instance.SignedOut += () =>
-        {
-            Debug.Log("Player signed out.");
-        };
-
-        AuthenticationService.Instance.Expired += () =>
-          {
-              Debug.Log("Player session could not be refreshed and expired.");
-          };
-    }
     public async void SaveSomeData()
     {
         var data = new Dictionary<string, object> { { "key", "someValue" } };
