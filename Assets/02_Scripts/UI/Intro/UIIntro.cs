@@ -23,7 +23,7 @@ public class UIIntro : MonoBehaviour
         string uid = PlayerPrefs.GetString("uid", "1000");
         await UserDataManager.Instance.LoadUserOrCreateNewAsync(uid);
         PlayerPrefs.SetString("uid", uid);
-        var mainSceneAsync = SceneManager.LoadSceneAsync("Main");
+        var mainSceneAsync = SceneManager.LoadSceneAsync("UGSTest");
         await UniTask.WaitUntil(() => mainSceneAsync.isDone);
     }
 

@@ -21,10 +21,10 @@ public class SceneChangeEditor : Editor
         Debug.Log("Move Main Scene");
     }
 
-    [MenuItem("SceneMove/Scene_UnitTest &3")]
+    [MenuItem("SceneMove/Scene_UGSTest &3")]
     private static void UnitTestScene()
     {
-        EditorSceneManager.OpenScene("Assets/01_Scenes/UnitTest.unity");
+        EditorSceneManager.OpenScene("Assets/Test/UGSTest/UGSTest.unity");
         Debug.Log("Move Unit Test");
     }    
     

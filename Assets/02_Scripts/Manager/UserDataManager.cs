@@ -9,6 +9,7 @@ public class BaseData
     public long dbVersion;
     public string userUID;
 
+
     public long GetNextUID()
     {
         return uidSeed++;
@@ -17,6 +18,7 @@ public class BaseData
 public class UserDataManager : Singleton<UserDataManager>
 {
     public BaseData BaseData { get; set; }
+    public ReactiveProperty<int> PlayPoint = new ReactiveProperty<int>(0);
 
     public long GenerateUID()
     {

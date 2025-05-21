@@ -12,6 +12,7 @@ public class UnityAuthTest : MonoBehaviour
     [SerializeField] TMP_InputField idInputField;
     [SerializeField] TMP_InputField passwordInputField;
 
+    [SerializeField] TextMeshProUGUI PointText;
     [SerializeField] TextMeshProUGUI PlayerIDText;
 
     [SerializeField] Button signUpButton;
@@ -24,6 +25,7 @@ public class UnityAuthTest : MonoBehaviour
 
     [SerializeField] Button saveButton;
     [SerializeField] Button loadButton;
+    [SerializeField] Button IncreasePointButton;
     private
     async void Awake()
     {
@@ -152,6 +154,15 @@ public class UnityAuthTest : MonoBehaviour
         loadButton.onClick.AddListener(() =>
         {
             LoadSomeData();
+        });
+        IncreasePointButton.onClick.AddListener(() =>
+        {
+            UserDataManager.Instance.PlayPoint.Value++;
+        });
+
+        UserDataManager.Instance.PlayPoint.Subscribe(point =>
+        {
+            PointText.SetText(point.ToString());
         });
     }
 
