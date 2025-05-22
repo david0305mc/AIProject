@@ -12,15 +12,24 @@ using System.Linq;
 using System.Collections.Generic;
 using Unity.Services.CloudSave;
 using Unity.Services.CloudSave.Models;
-
+using UniRx;
 
 [Serializable]
-public class SampleObject
+public class PlayerSaveData
 {
     public string SophisticatedString;
     public int SparklingInt;
     public float AmazingFloat;
+
 }
+
+public class ReactivePlayerData
+{
+    public ReactiveProperty<string> SophisticatedString = new("Default");
+    public ReactiveProperty<int> SparklingInt = new(0);
+    public ReactiveProperty<float> AmazingFloat = new(0.0f);
+}
+
 
 public class AuthManager : Singleton<AuthManager>
 {
@@ -115,22 +124,14 @@ public class AuthManager : Singleton<AuthManager>
 
     private async UniTask LoadUserDataFromServer()
     {
-        var data = await RetrieveSpecificData<SampleObject>("Save01");
+        var data = await RetrieveSpecificData<PlayerSaveData>("Save01");
         if (data != null)
         {
-            UserDataManager.Instance.sampleObject = data;
+            UserDataManager.Instance.LoadFrom(data);
         }
         else
         {
             Debug.LogWarning("No data found, applying fallback...");
-
-            // ✅ fallback 로직: 기본값 설정
-            UserDataManager.Instance.sampleObject = new SampleObject
-            {
-                SophisticatedString = "Default",
-                SparklingInt = 0,
-                AmazingFloat = 0.0f
-            };
         }
     }
 
@@ -282,33 +283,20 @@ public class AuthManager : Singleton<AuthManager>
         }
     }
 
-
-    public async UniTask<string> ForceSaveObjectData(string key, SampleObject value)
+    public async UniTask<string> ForceSaveObjectData<T>(string key, T value)
     {
         try
         {
-            // Although we are only saving a single value here, you can save multiple keys
-            // and values in a single batch.
             Dictionary<string, object> oneElement = new Dictionary<string, object>
-                {
-                    { key, value }
-                };
+        {
+            { key, value }
+        };
 
-            // Saving data without write lock validation by passing the data as an object instead of a SaveItem
             Dictionary<string, string> result = await CloudSaveService.Instance.Data.Player.SaveAsync(oneElement);
             string writeLock = result[key];
 
-            Debug.Log($"Successfully saved {key}:{value} with updated write lock {writeLock}");
-
+            Debug.Log($"Successfully saved {key}:{JsonUtility.ToJson(value)} with updated write lock {writeLock}");
             return writeLock;
-        }
-        catch (CloudSaveValidationException e)
-        {
-            Debug.LogError(e);
-        }
-        catch (CloudSaveRateLimitedException e)
-        {
-            Debug.LogError(e);
         }
         catch (CloudSaveException e)
         {
@@ -318,7 +306,8 @@ public class AuthManager : Singleton<AuthManager>
         return null;
     }
 
-    public async UniTask<string> SaveObjectData(string key, SampleObject value, string writeLock)
+
+    public async UniTask<string> SaveObjectData(string key, PlayerSaveData value, string writeLock)
     {
         try
         {

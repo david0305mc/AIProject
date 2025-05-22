@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
@@ -18,8 +19,8 @@ public class BaseData
 public class UserDataManager : Singleton<UserDataManager>
 {
     public BaseData BaseData { get; set; }
-    public ReactiveProperty<int> PlayPoint = new ReactiveProperty<int>(0);
-    public SampleObject sampleObject = new SampleObject();
+    // public ReactiveProperty<int> PlayPoint = new ReactiveProperty<int>(0);
+    public ReactivePlayerData ReactivePlayerData = new ReactivePlayerData();
 
     public long GenerateUID()
     {
@@ -157,4 +158,57 @@ public class UserDataManager : Singleton<UserDataManager>
         enemyDic.Clear();
         playerData = null;
     }
+    public void LoadFrom(PlayerSaveData source)
+    {
+        var sourceFields = typeof(PlayerSaveData).GetFields();
+        var targetFields = ReactivePlayerData.GetType().GetFields();
+
+        foreach (var src in sourceFields)
+        {
+            var target = targetFields.FirstOrDefault(f =>
+                f.Name == src.Name &&
+                f.FieldType.IsGenericType &&
+                f.FieldType.GetGenericTypeDefinition() == typeof(ReactiveProperty<>));
+
+            if (target != null)
+            {
+                // ✅ ReactivePlayerData 인스턴스에서 가져와야 함
+                var reactiveInstance = target.GetValue(ReactivePlayerData);
+                if (reactiveInstance == null) continue;
+
+                var valueProp = reactiveInstance.GetType().GetProperty("Value");
+                valueProp?.SetValue(reactiveInstance, src.GetValue(source));
+            }
+        }
+    }
+
+    public PlayerSaveData ToPlayerSaveData()
+    {
+        var result = new PlayerSaveData();
+        var sourceFields = ReactivePlayerData.GetType().GetFields();
+        var targetFields = typeof(PlayerSaveData).GetFields();
+
+        foreach (var target in targetFields)
+        {
+            var source = sourceFields.FirstOrDefault(f =>
+                f.Name == target.Name &&
+                f.FieldType.IsGenericType &&
+                f.FieldType.GetGenericTypeDefinition() == typeof(ReactiveProperty<>));
+
+            if (source != null)
+            {
+                // ❗️수정: ReactivePlayerData 인스턴스를 기준으로 값 추출해야 함
+                var reactiveInstance = source.GetValue(ReactivePlayerData);
+                if (reactiveInstance == null) continue;
+
+                var valueProp = reactiveInstance.GetType().GetProperty("Value");
+                var value = valueProp?.GetValue(reactiveInstance);
+                target.SetValue(result, value);
+            }
+        }
+
+        return result;
+    }
+
+
 }
