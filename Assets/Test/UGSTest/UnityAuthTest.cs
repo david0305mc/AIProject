@@ -34,6 +34,7 @@ public class UnityAuthTest : MonoBehaviour
             await AuthManager.Instance.InitializeAsync();
             AuthManager.Instance.InitGPGS();
             await AuthManager.Instance.SignInCachedUserAsync();
+            UpdateUI();
         }
         catch (Exception e)
         {
@@ -99,6 +100,7 @@ public class UnityAuthTest : MonoBehaviour
                 if (!string.IsNullOrEmpty(code))
                 {
                     await AuthManager.Instance.SignInWithGooglePlayGamesAsync(code);
+                    UpdateUI();
                 }
                 else
                 {
@@ -126,6 +128,7 @@ public class UnityAuthTest : MonoBehaviour
                 if (!string.IsNullOrEmpty(code))
                 {
                     await AuthManager.Instance.LinkWithGooglePlayGamesAsync(code);
+                    UpdateUI();
                 }
                 else
                 {
@@ -140,6 +143,7 @@ public class UnityAuthTest : MonoBehaviour
         guestLogin.onClick.AddListener(async () =>
         {
             await AuthManager.Instance.SignInAnonymouslyAsync();
+            UpdateUI();
         });
 
         unLinkGPGS.onClick.AddListener(async () =>
@@ -155,15 +159,24 @@ public class UnityAuthTest : MonoBehaviour
         {
             LoadSomeData();
         });
-        IncreasePointButton.onClick.AddListener(() =>
+        IncreasePointButton.onClick.AddListener(async () =>
         {
             UserDataManager.Instance.PlayPoint.Value++;
+            UserDataManager.Instance.sampleObject.SparklingInt++;
+            await AuthManager.Instance.ForceSaveObjectData("Save01", UserDataManager.Instance.sampleObject);
+            UpdateUI();
+
         });
 
-        UserDataManager.Instance.PlayPoint.Subscribe(point =>
-        {
-            PointText.SetText(point.ToString());
-        });
+        // UserDataManager.Instance.PlayPoint.Subscribe(point =>
+        // {
+        //     PointText.SetText(point.ToString());
+        // });
+    }
+
+    private void UpdateUI()
+    {
+        PointText.SetText(UserDataManager.Instance.sampleObject.SparklingInt.ToString());
     }
 
     public async void SaveSomeData()

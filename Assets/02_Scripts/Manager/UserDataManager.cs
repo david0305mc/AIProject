@@ -19,6 +19,7 @@ public class UserDataManager : Singleton<UserDataManager>
 {
     public BaseData BaseData { get; set; }
     public ReactiveProperty<int> PlayPoint = new ReactiveProperty<int>(0);
+    public SampleObject sampleObject = new SampleObject();
 
     public long GenerateUID()
     {

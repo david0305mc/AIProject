@@ -9,6 +9,18 @@ using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using UniRx;
 using System.Linq;
+using System.Collections.Generic;
+using Unity.Services.CloudSave;
+using Unity.Services.CloudSave.Models;
+
+
+[Serializable]
+public class SampleObject
+{
+    public string SophisticatedString;
+    public int SparklingInt;
+    public float AmazingFloat;
+}
 
 public class AuthManager : Singleton<AuthManager>
 {
@@ -101,6 +113,27 @@ public class AuthManager : Singleton<AuthManager>
         };
     }
 
+    private async UniTask LoadUserDataFromServer()
+    {
+        var data = await RetrieveSpecificData<SampleObject>("Save01");
+        if (data != null)
+        {
+            UserDataManager.Instance.sampleObject = data;
+        }
+        else
+        {
+            Debug.LogWarning("No data found, applying fallback...");
+
+            // ✅ fallback 로직: 기본값 설정
+            UserDataManager.Instance.sampleObject = new SampleObject
+            {
+                SophisticatedString = "Default",
+                SparklingInt = 0,
+                AmazingFloat = 0.0f
+            };
+        }
+    }
+
     public async UniTask SignInAnonymouslyAsync()
     {
         try
@@ -110,6 +143,7 @@ public class AuthManager : Singleton<AuthManager>
 
             // Shows how to get the playerID
             Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
+            await LoadUserDataFromServer();
 
         }
         catch (AuthenticationException ex)
@@ -131,6 +165,8 @@ public class AuthManager : Singleton<AuthManager>
         {
             await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(authCode);
             IsGPGSSignIned.Value = true;
+            await LoadUserDataFromServer();
+
             Debug.Log("SignIn is successful.");
         }
         catch (AuthenticationException ex)
@@ -203,7 +239,7 @@ public class AuthManager : Singleton<AuthManager>
             // if not, then do nothing
             return;
         }
-        SignInAnonymouslyAsync().Forget();
+        await SignInAnonymouslyAsync();
     }
     public async UniTask SignUpWithUsernamePasswordAsync(string username, string password)
     {
@@ -243,6 +279,138 @@ public class AuthManager : Singleton<AuthManager>
             // Compare error code to CommonErrorCodes
             // Notify the player with the proper error message
             Debug.LogException(ex);
+        }
+    }
+
+
+    public async UniTask<string> ForceSaveObjectData(string key, SampleObject value)
+    {
+        try
+        {
+            // Although we are only saving a single value here, you can save multiple keys
+            // and values in a single batch.
+            Dictionary<string, object> oneElement = new Dictionary<string, object>
+                {
+                    { key, value }
+                };
+
+            // Saving data without write lock validation by passing the data as an object instead of a SaveItem
+            Dictionary<string, string> result = await CloudSaveService.Instance.Data.Player.SaveAsync(oneElement);
+            string writeLock = result[key];
+
+            Debug.Log($"Successfully saved {key}:{value} with updated write lock {writeLock}");
+
+            return writeLock;
+        }
+        catch (CloudSaveValidationException e)
+        {
+            Debug.LogError(e);
+        }
+        catch (CloudSaveRateLimitedException e)
+        {
+            Debug.LogError(e);
+        }
+        catch (CloudSaveException e)
+        {
+            Debug.LogError(e);
+        }
+
+        return null;
+    }
+
+    public async UniTask<string> SaveObjectData(string key, SampleObject value, string writeLock)
+    {
+        try
+        {
+            // Although we are only saving a single value here, you can save multiple keys
+            // and values in a single batch.
+            // Use SaveItem to specify a write lock. The request will fail if the provided write lock
+            // does not match the one currently saved on the server.
+            Dictionary<string, SaveItem> oneElement = new Dictionary<string, SaveItem>
+                {
+                    { key, new SaveItem(value, writeLock) }
+                };
+
+            // Saving data with write lock validation by using a SaveItem with the write lock specified
+            Dictionary<string, string> result = await CloudSaveService.Instance.Data.Player.SaveAsync(oneElement);
+            string newWriteLock = result[key];
+
+            Debug.Log($"Successfully saved {key}:{value} with updated write lock {newWriteLock}");
+
+            return newWriteLock;
+        }
+        catch (CloudSaveValidationException e)
+        {
+            Debug.LogError(e);
+        }
+        catch (CloudSaveRateLimitedException e)
+        {
+            Debug.LogError(e);
+        }
+        catch (CloudSaveException e)
+        {
+            Debug.LogError(e);
+        }
+
+        return null;
+    }
+    public async UniTask<T> RetrieveSpecificData<T>(string key)
+    {
+        try
+        {
+            var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
+
+            if (results.TryGetValue(key, out var item))
+            {
+                return item.Value.GetAs<T>();
+            }
+            else
+            {
+                Debug.Log($"There is no such key as {key}!");
+            }
+        }
+        catch (CloudSaveValidationException e)
+        {
+            Debug.LogError(e);
+        }
+        catch (CloudSaveRateLimitedException e)
+        {
+            Debug.LogError(e);
+        }
+        catch (CloudSaveException e)
+        {
+            Debug.LogError(e);
+        }
+
+        return default;
+    }
+
+    public async UniTask RetrieveEverything()
+    {
+        try
+        {
+            // If you wish to load only a subset of keys rather than everything, you
+            // can call a method LoadAsync and pass a HashSet of keys into it.
+            var results = await CloudSaveService.Instance.Data.Player.LoadAllAsync();
+
+            Debug.Log($"{results.Count} elements loaded!");
+
+            foreach (var result in results)
+            {
+                Debug.Log($"Key: {result.Key}, Value: {result.Value.Value}");
+            }
+        }
+        catch (CloudSaveValidationException e)
+        {
+            Debug.LogError(e);
+        }
+        catch (CloudSaveRateLimitedException e)
+        {
+            Debug.LogError(e);
+        }
+        catch (CloudSaveException e)
+        {
+            Debug.LogError(e);
         }
     }
 
