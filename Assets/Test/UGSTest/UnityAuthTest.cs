@@ -6,7 +6,7 @@ using TMPro;
 using System.Collections.Generic;
 using Unity.Services.CloudSave;
 using UniRx;
-using Unity.Services.Authentication;
+using Unity.Services.CloudCode;
 public class UnityAuthTest : MonoBehaviour
 {
     [SerializeField] TMP_InputField idInputField;
@@ -26,6 +26,16 @@ public class UnityAuthTest : MonoBehaviour
     [SerializeField] Button saveButton;
     [SerializeField] Button loadButton;
     [SerializeField] Button IncreasePointButton;
+    [SerializeField] Button cloudCodeButton;
+    class GiveLoginBonus
+    {
+
+        public int roll;
+        public int sides;
+
+    };
+
+
     private
     async void Awake()
     {
@@ -163,6 +173,20 @@ public class UnityAuthTest : MonoBehaviour
             await AuthManager.Instance.ForceSaveObjectData("Save01", saveData);
 
         });
+        cloudCodeButton.onClick.AddListener(async () =>
+        {
+            try
+            {
+
+                var result = await CloudCodeService.Instance.CallEndpointAsync<GiveLoginBonus>("GiveLoginBonus", new());
+                Debug.Log($"result : {result.roll} {result.sides}");
+            }
+            catch (CloudCodeException e)
+            {
+                Debug.LogError($"Cloud Code 에러 발생: {e.Message}");
+            }
+
+        });
 
         UserDataManager.Instance.ReactivePlayerData.SparklingInt.Subscribe(point =>
                 {
@@ -180,46 +204,46 @@ public class UnityAuthTest : MonoBehaviour
     // }
 
     public async void SaveSomeData()
-    {
-        var data = new Dictionary<string, object> { { "key", "someValue" } };
-        await CloudSaveService.Instance.Data.Player.SaveAsync(data);
-    }
-    public async void LoadSomeData()
-    {
-        var savedData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "key" });
+{
+    var data = new Dictionary<string, object> { { "key", "someValue" } };
+    await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+}
+public async void LoadSomeData()
+{
+    var savedData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "key" });
 
-        Debug.Log("Done: " + savedData["key"]);
-    }
-    private async UniTask<T> RetrieveSpecificData<T>(string key)
+    Debug.Log("Done: " + savedData["key"]);
+}
+private async UniTask<T> RetrieveSpecificData<T>(string key)
+{
+    try
     {
-        try
-        {
-            var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
+        var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
 
-            if (results.TryGetValue(key, out var item))
-            {
-                return item.Value.GetAs<T>();
-            }
-            else
-            {
-                Debug.Log($"There is no such key as {key}!");
-            }
-        }
-        catch (CloudSaveValidationException e)
+        if (results.TryGetValue(key, out var item))
         {
-            Debug.LogError(e);
+            return item.Value.GetAs<T>();
         }
-        catch (CloudSaveRateLimitedException e)
+        else
         {
-            Debug.LogError(e);
+            Debug.Log($"There is no such key as {key}!");
         }
-        catch (CloudSaveException e)
-        {
-            Debug.LogError(e);
-        }
-
-        return default;
     }
+    catch (CloudSaveValidationException e)
+    {
+        Debug.LogError(e);
+    }
+    catch (CloudSaveRateLimitedException e)
+    {
+        Debug.LogError(e);
+    }
+    catch (CloudSaveException e)
+    {
+        Debug.LogError(e);
+    }
+
+    return default;
+}
 }
 [Serializable]
 public class SampleItem
