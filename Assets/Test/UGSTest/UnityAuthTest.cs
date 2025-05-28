@@ -29,12 +29,15 @@ public class UnityAuthTest : MonoBehaviour
     [SerializeField] Button cloudCodeButton;
     class GiveLoginBonus
     {
-
         public int roll;
         public int sides;
-
     };
 
+    class RequestServerTime
+    {
+        public long timestamp;
+        public string formattedDate;
+    };
 
     private
     async void Awake()
@@ -175,11 +178,20 @@ public class UnityAuthTest : MonoBehaviour
         });
         cloudCodeButton.onClick.AddListener(async () =>
         {
+            // try
+            // {
+
+            //     var result = await CloudCodeService.Instance.CallEndpointAsync<GiveLoginBonus>("GiveLoginBonus", new());
+            //     Debug.Log($"result : {result.roll} {result.sides}");
+            // }
+            // catch (CloudCodeException e)
+            // {
+            //     Debug.LogError($"Cloud Code 에러 발생: {e.Message}");
+            // }
             try
             {
-
-                var result = await CloudCodeService.Instance.CallEndpointAsync<GiveLoginBonus>("GiveLoginBonus", new());
-                Debug.Log($"result : {result.roll} {result.sides}");
+                var result = await CloudCodeService.Instance.CallEndpointAsync<RequestServerTime>("RequestServerTime", new());
+                Debug.Log($"result : {result.timestamp} {result.formattedDate}");
             }
             catch (CloudCodeException e)
             {
