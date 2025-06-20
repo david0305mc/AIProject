@@ -4,10 +4,11 @@ using VContainer.Unity;
 using MessagePipe;
 using MessagePipe.VContainer;
 using UniRx;
+using System;
 
 namespace MyGame
 {
-    enum EMessageType
+    public enum EMessageType
     {
         A,
         B,
@@ -24,45 +25,32 @@ namespace MyGame
             {
                 GlobalMessagePipe.SetProvider(c.AsServiceProvider());
             });
-            builder.RegisterEntryPoint<MessagePipeDemo>(Lifetime.Singleton);
         }
     }
 
-    public class MessagePipeDemo : VContainer.Unity.IStartable
+    public static class MessageDispatcher
     {
-        private readonly ISubscriber<EMessageType, MyMessage> _subscriber;
-        private readonly CompositeDisposable _disposables = new();
-
-        public MessagePipeDemo()
+        public static void Publish(EMessageType message)
         {
-            _subscriber = GlobalMessagePipe.GetSubscriber<EMessageType, MyMessage>();
+            GlobalMessagePipe
+                .GetPublisher<EMessageType, Unit>()
+                .Publish(message, Unit.Default);
+        }
+        public static void Publish<T>(EMessageType message, T param)
+        {
+            GlobalMessagePipe
+                .GetPublisher<EMessageType, T>()
+                .Publish(message, param);
         }
 
-        public void Start()
+        public static IObservable<TMessage> Subscribe<TMessage>()
         {
-            _subscriber.Subscribe(EMessageType.A, message =>
-            {
-                Debug.Log($"[A] 수신: {message.Content}");
-            }).AddTo(_disposables);
-
-            _subscriber.Subscribe(EMessageType.B, message =>
-            {
-                Debug.Log($"[B] 수신: {message.Content}");
-            }).AddTo(_disposables);
+            return GlobalMessagePipe.GetSubscriber<TMessage>().AsObservable();
         }
 
-        public void Dispose()
+        public static IObservable<TMessage> Subscribe<TKey, TMessage>(TKey key)
         {
-            _disposables.Dispose();
+            return GlobalMessagePipe.GetSubscriber<TKey, TMessage>().AsObservable(key);
         }
     }
-    public class MyMessage
-    {
-        public string Content;
-        public MyMessage(string content)
-        {
-            Content = content;
-        }
-    }
-
 }
