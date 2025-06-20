@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Test/UGSTest/UGSTest.unity
     guid: 42464b7fffa869146873bad60936742e
+  - enabled: 1
+    path: Assets/Test/MessagePipeTest/MessagePipeTest.unity
+    guid: 33f1ebc23dea19d4498f47e59e4d53ce
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
