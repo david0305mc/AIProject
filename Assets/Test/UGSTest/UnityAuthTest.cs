@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Unity.Services.CloudSave;
 using UniRx;
 using Unity.Services.CloudCode;
+using UnityEngine.SceneManagement;
 public class UnityAuthTest : MonoBehaviour
 {
     [SerializeField] TMP_InputField idInputField;
