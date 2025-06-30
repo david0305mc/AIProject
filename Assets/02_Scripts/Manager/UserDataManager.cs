@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -16,9 +17,15 @@ public class BaseData
         return uidSeed++;
     }
 }
+
+public class SkillData
+{
+    public Dictionary<int, int> SkillLevels = new Dictionary<int, int>();
+}
 public class UserDataManager : Singleton<UserDataManager>
 {
     public BaseData BaseData { get; set; }
+    public SkillData SkillData { get; set; } = new SkillData();
     // public ReactiveProperty<int> PlayPoint = new ReactiveProperty<int>(0);
     public ReactivePlayerData ReactivePlayerData = new ReactivePlayerData();
 
