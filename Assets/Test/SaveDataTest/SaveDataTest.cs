@@ -195,7 +195,7 @@ namespace SaveData
         }
         public void OnClickAddItem()
         {
-            int itemId = Random.Range(1, 100);
+            int itemId = Random.Range(0, 3);
             int itemCount = Random.Range(1, 10);
             if (UserDataManager.Instance.UserData.ItemCount.ContainsKey(itemId))
             {
@@ -212,7 +212,7 @@ namespace SaveData
         }
         public void OnClickAddQuest()
         {
-            int questId = Random.Range(1, 100);
+            int questId = Random.Range(0, 3);
             if (UserDataManager.Instance.UserData.QuestData.ContainsKey(questId))
             {
                 UserDataManager.Instance.UserData.QuestData[questId].progress += 1;
