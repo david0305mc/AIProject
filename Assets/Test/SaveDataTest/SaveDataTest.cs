@@ -18,68 +18,82 @@ namespace SaveData
     }
 
     [System.Serializable]
-    public class SkillData
+    public class UserData
     {
+        public BaseData BaseData = new BaseData();
         public Dictionary<int, int> SkillLevels = new Dictionary<int, int>();
+        public Dictionary<int, int> ItemCount = new Dictionary<int, int>();
+        public Dictionary<int, QuestData> QuestData { get; set; } = new Dictionary<int, QuestData>();
+
+        public long GetNextUID()
+        {
+            return BaseData.GetNextUID();
+        }
     }
 
     [System.Serializable]
-    public class ItemData
+    public class QuestData
     {
-        public Dictionary<int, int> ItemCount = new Dictionary<int, int>();
+        public int id;
+        public int progress;
+        public bool isCompleted;
     }
 
     public class UserDataManager : Singleton<UserDataManager>
     {
-        public BaseData BaseData { get; set; } = new BaseData();
-        public SkillData SkillData { get; set; } = new SkillData();
-        public ItemData ItemData { get; set; } = new ItemData();
+        public UserData UserData { get; set; } = new UserData();
 
-        private string savePath => Path.Combine(Application.persistentDataPath, "userdata.json");
+        // 각 필드별 dirty 관리
+        private Dictionary<string, bool> dirtyFlags = new Dictionary<string, bool>();
+        private string dataPath => Application.persistentDataPath;
 
         protected override void init()
         {
             base.init();
         }
 
-        public BaseData LoadData()
+        public void LoadAllData()
         {
-            if (!File.Exists(savePath))
-                return null;
-
-            string json = File.ReadAllText(savePath);
-            var loadedContainer = JsonConvert.DeserializeObject<DataContainer>(json);
-            this.BaseData = loadedContainer.BaseData;
-            this.SkillData = loadedContainer.SkillData;
-
-            return this.BaseData;
+            var fields = typeof(UserData).GetFields();
+            foreach (var field in fields)
+            {
+                string fileName = Path.Combine(dataPath, field.Name + ".json");
+                if (File.Exists(fileName))
+                {
+                    var value = JsonConvert.DeserializeObject(File.ReadAllText(fileName), field.FieldType);
+                    field.SetValue(UserData, value);
+                }
+                // dirty 초기화
+                dirtyFlags[field.Name] = false;
+            }
         }
 
-        public void SaveData()
+        public void SaveAllData()
         {
-            var container = new DataContainer()
+            var fields = typeof(UserData).GetFields();
+            foreach (var field in fields)
             {
-                BaseData = this.BaseData,
-                SkillData = this.SkillData,
-                ItemData = this.ItemData 
-            };
+                if (dirtyFlags.TryGetValue(field.Name, out bool isDirty) && isDirty)
+                {
+                    string fileName = Path.Combine(dataPath, field.Name + ".json");
+                    var value = field.GetValue(UserData);
+                    File.WriteAllText(fileName, JsonConvert.SerializeObject(value, Formatting.Indented));
+                    dirtyFlags[field.Name] = false;
+                }
+            }
+        }
 
-            string json = JsonConvert.SerializeObject(container, Formatting.Indented);
-            File.WriteAllText(savePath, json);
+        // 필드명으로 dirty 처리
+        public void MarkDirty(string fieldName)
+        {
+            dirtyFlags[fieldName] = true;
         }
 
         public void CreateNewUser()
         {
-            this.BaseData.userUID = this.BaseData.GetNextUID();
-            SaveData();
-        }
-
-        [System.Serializable]
-        public class DataContainer
-        {
-            public BaseData BaseData;
-            public SkillData SkillData;
-            public ItemData ItemData; 
+            UserData.BaseData.userUID = UserData.GetNextUID();
+            MarkDirty(nameof(UserData.BaseData));
+            SaveAllData();
         }
     }
 
@@ -89,57 +103,66 @@ namespace SaveData
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            // if first User
-            var userData = UserDataManager.Instance.LoadData();
-            if (userData == null || userData.userUID == -1)
+            UserDataManager.Instance.LoadAllData();
+            var userData = UserDataManager.Instance.UserData;
+            if (userData == null || userData.BaseData.userUID == -1)
             {
                 Debug.Log("No existing user data found. Creating new user UID.");
-                // Create a new BaseData instance
-                UserDataManager.Instance.BaseData = new BaseData();
+                UserDataManager.Instance.UserData = new UserData();
                 UserDataManager.Instance.CreateNewUser();
+                UserDataManager.Instance.SaveAllData();
             }
             else
             {
-                Debug.Log($"Existing User UID: {userData.userUID}");
+                Debug.Log($"Existing User UID: {userData.BaseData.userUID}");
             }
         }
-
         public void OnClickAddItem()
         {
-            // Add item with ID 1 and count 10
-            int itemId = Random.Range(1, 100); // Random item ID for testing
-            int itemCount = Random.Range(1, 10); // Random item count for testing
-
-            if (UserDataManager.Instance.ItemData.ItemCount.ContainsKey(itemId))
+            int itemId = Random.Range(1, 100);
+            int itemCount = Random.Range(1, 10);
+            if (UserDataManager.Instance.UserData.ItemCount.ContainsKey(itemId))
             {
-                UserDataManager.Instance.ItemData.ItemCount[itemId] += itemCount;
+                UserDataManager.Instance.UserData.ItemCount[itemId] += itemCount;
             }
             else
             {
-                UserDataManager.Instance.ItemData.ItemCount[itemId] = itemCount;
+                UserDataManager.Instance.UserData.ItemCount[itemId] = itemCount;
             }
-
-            UserDataManager.Instance.SaveData();
-            Debug.Log($"Item {itemId} added. New count: {UserDataManager.Instance.ItemData.ItemCount[itemId]}");
+            UserDataManager.Instance.MarkDirty(nameof(UserData.ItemCount));
+            UserDataManager.Instance.SaveAllData();
+            Debug.Log($"Item {itemId} added. New count: {UserDataManager.Instance.UserData.ItemCount[itemId]}");
         }
-
         public void OnClickAddSkill()
         {
-            // Add skill with ID 1 and level 1
-            int skillId = Random.Range(1, 100); // Random skill ID for testing
-            int skillLevel = Random.Range(1, 5); // Random skill level for testing
-
-            if (UserDataManager.Instance.SkillData.SkillLevels.ContainsKey(skillId))
+            int skillId = Random.Range(1, 100);
+            int skillLevel = Random.Range(1, 5);
+            if (UserDataManager.Instance.UserData.SkillLevels.ContainsKey(skillId))
             {
-                UserDataManager.Instance.SkillData.SkillLevels[skillId] += skillLevel;
+                UserDataManager.Instance.UserData.SkillLevels[skillId] += skillLevel;
             }
             else
             {
-                UserDataManager.Instance.SkillData.SkillLevels[skillId] = skillLevel;
+                UserDataManager.Instance.UserData.SkillLevels[skillId] = skillLevel;
             }
-
-            UserDataManager.Instance.SaveData();
-            Debug.Log($"Skill {skillId} added. New level: {UserDataManager.Instance.SkillData.SkillLevels[skillId]}");
+            UserDataManager.Instance.MarkDirty(nameof(UserData.SkillLevels));
+            UserDataManager.Instance.SaveAllData();
+            Debug.Log($"Skill {skillId} added. New level: {UserDataManager.Instance.UserData.SkillLevels[skillId]}");
+        }
+        public void OnClickAddQuest()
+        {
+            int questId = Random.Range(1, 100);
+            if (UserDataManager.Instance.UserData.QuestData.ContainsKey(questId))
+            {
+                UserDataManager.Instance.UserData.QuestData[questId].progress += 1;
+            }
+            else
+            {
+                UserDataManager.Instance.UserData.QuestData[questId] = new QuestData { id = questId, progress = 0, isCompleted = false };
+            }
+            UserDataManager.Instance.MarkDirty(nameof(UserData.QuestData));
+            UserDataManager.Instance.SaveAllData();
+            Debug.Log($"Quest {questId} added. New progress: {UserDataManager.Instance.UserData.QuestData[questId].progress}");
         }
 
         
