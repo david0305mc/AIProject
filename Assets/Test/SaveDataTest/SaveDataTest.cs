@@ -1,7 +1,13 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
+using UniRx;
+using System.Linq;
+using System.Reflection;
+
+using Random = UnityEngine.Random;
 
 namespace SaveData
 {
@@ -10,6 +16,8 @@ namespace SaveData
     {
         public long uidSeed = 1000;
         public long userUID = -1;
+
+        public ReactiveProperty<long> Gold { get; private set; } = new ReactiveProperty<long>(-1);
 
         public long GetNextUID()
         {
@@ -37,48 +45,103 @@ namespace SaveData
         public int id;
         public int progress;
         public bool isCompleted;
+        public ReactiveProperty<int> CompleteCount { get; private set; }
     }
 
     public class UserDataManager : Singleton<UserDataManager>
     {
         public UserData UserData { get; set; } = new UserData();
-
-        // 각 필드별 dirty 관리
         private Dictionary<string, bool> dirtyFlags = new Dictionary<string, bool>();
         private string dataPath => Application.persistentDataPath;
 
-        protected override void init()
+        // 각 필드/프로퍼티별로 1개 파일 저장
+        public void SaveAllData()
         {
-            base.init();
+            var members = typeof(UserData)
+                .GetMembers(BindingFlags.Public | BindingFlags.Instance)
+                .Where(m => m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property);
+
+            foreach (var member in members)
+            {
+                Type type;
+                object value;
+                string name = member.Name;
+
+                if (member is FieldInfo field)
+                {
+                    type = field.FieldType;
+                    value = field.GetValue(UserData);
+                }
+                else if (member is PropertyInfo prop && prop.CanRead && prop.CanWrite)
+                {
+                    type = prop.PropertyType;
+                    value = prop.GetValue(UserData);
+                }
+                else
+                {
+                    continue;
+                }
+
+                string fileName = Path.Combine(dataPath, $"{name}.json");
+
+                // ReactiveProperty 처리
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ReactiveProperty<>))
+                {
+                    var valueProp = type.GetProperty("Value");
+                    var raw = valueProp.GetValue(value);
+                    File.WriteAllText(fileName, JsonConvert.SerializeObject(raw, Formatting.Indented));
+                }
+                else
+                {
+                    File.WriteAllText(fileName, JsonConvert.SerializeObject(value, Formatting.Indented));
+                }
+            }
         }
 
         public void LoadAllData()
         {
-            var fields = typeof(UserData).GetFields();
-            foreach (var field in fields)
-            {
-                string fileName = Path.Combine(dataPath, field.Name + ".json");
-                if (File.Exists(fileName))
-                {
-                    var value = JsonConvert.DeserializeObject(File.ReadAllText(fileName), field.FieldType);
-                    field.SetValue(UserData, value);
-                }
-                // dirty 초기화
-                dirtyFlags[field.Name] = false;
-            }
-        }
+            var members = typeof(UserData)
+                .GetMembers(BindingFlags.Public | BindingFlags.Instance)
+                .Where(m => m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property);
 
-        public void SaveAllData()
-        {
-            var fields = typeof(UserData).GetFields();
-            foreach (var field in fields)
+            foreach (var member in members)
             {
-                if (dirtyFlags.TryGetValue(field.Name, out bool isDirty) && isDirty)
+                Type type;
+                string name = member.Name;
+
+                if (member is FieldInfo field)
                 {
-                    string fileName = Path.Combine(dataPath, field.Name + ".json");
-                    var value = field.GetValue(UserData);
-                    File.WriteAllText(fileName, JsonConvert.SerializeObject(value, Formatting.Indented));
-                    dirtyFlags[field.Name] = false;
+                    type = field.FieldType;
+                }
+                else if (member is PropertyInfo prop && prop.CanRead && prop.CanWrite)
+                {
+                    type = prop.PropertyType;
+                }
+                else
+                {
+                    continue;
+                }
+
+                string fileName = Path.Combine(dataPath, $"{name}.json");
+                if (!File.Exists(fileName)) continue;
+
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ReactiveProperty<>))
+                {
+                    var valueType = type.GetGenericArguments()[0];
+                    var raw = JsonConvert.DeserializeObject(File.ReadAllText(fileName), valueType);
+                    var reactive = Activator.CreateInstance(type, raw);
+                    if (member is FieldInfo f)
+                        f.SetValue(UserData, reactive);
+                    else if (member is PropertyInfo p)
+                        p.SetValue(UserData, reactive);
+                }
+                else
+                {
+                    var value = JsonConvert.DeserializeObject(File.ReadAllText(fileName), type);
+                    if (member is FieldInfo f)
+                        f.SetValue(UserData, value);
+                    else if (member is PropertyInfo p)
+                        p.SetValue(UserData, value);
                 }
             }
         }
@@ -88,7 +151,6 @@ namespace SaveData
         {
             dirtyFlags[fieldName] = true;
         }
-
         public void CreateNewUser()
         {
             UserData.BaseData.userUID = UserData.GetNextUID();
@@ -165,7 +227,16 @@ namespace SaveData
             Debug.Log($"Quest {questId} added. New progress: {UserDataManager.Instance.UserData.QuestData[questId].progress}");
         }
 
-        
+        public void OnClickAddGold()
+        {
+            long goldToAdd = Random.Range(100, 1000);
+            UserDataManager.Instance.UserData.BaseData.Gold.Value += goldToAdd;
+            UserDataManager.Instance.MarkDirty(nameof(UserData.BaseData.Gold));
+            UserDataManager.Instance.SaveAllData();
+            Debug.Log($"Gold added: {goldToAdd}. New total: {UserDataManager.Instance.UserData.BaseData.Gold.Value}");
+        }
+
+
     }
 
 
