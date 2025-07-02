@@ -1,5 +1,3 @@
-
-
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using UnityEngine;
@@ -12,7 +10,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Unity.Services.CloudSave;
 using Unity.Services.CloudSave.Models;
-using UniRx;
 
 [Serializable]
 public class PlayerSaveData
@@ -58,7 +55,7 @@ public class AuthManager : Singleton<AuthManager>
         PlayGamesPlatform.Activate();
     }
 
-    public UniTask<string> LoginGooglePlayGames()
+    public UniTask<string> RequestAuthTokenFromGPGS()
     {
         var tcs = new UniTaskCompletionSource<string>();
 
@@ -87,12 +84,10 @@ public class AuthManager : Singleton<AuthManager>
     {
         AuthenticationService.Instance.SignedIn += async () =>
         {
-            // Shows how to get a playerID
             Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
             PlayerID.Value = AuthenticationService.Instance.PlayerId;
 
             var playerInfo = await AuthenticationService.Instance.GetPlayerInfoAsync();
-
             foreach (var identity in playerInfo.Identities)
             {
                 Debug.Log($"Identity Provider: {identity.TypeId}");
@@ -100,13 +95,10 @@ public class AuthManager : Singleton<AuthManager>
             IsGPGSSignIned.Value = !string.IsNullOrEmpty(playerInfo.GetGooglePlayGamesId());
             IsGuestSignIned.Value = playerInfo.Identities.Count() == 0;
 
-            // Shows how to get an access token
             Debug.Log($"Access Token: {AuthenticationService.Instance.AccessToken}");
-            var test = await AuthenticationService.Instance.GetPlayerInfoAsync();
-
         };
 
-        AuthenticationService.Instance.SignInFailed += (err) =>
+        AuthenticationService.Instance.SignInFailed += err =>
         {
             Debug.LogError(err);
         };
