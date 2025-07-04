@@ -10,6 +10,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Unity.Services.CloudSave;
 using Unity.Services.CloudSave.Models;
+using Unity.Services.CloudCode;
 
 [Serializable]
 public class PlayerSaveData
@@ -34,6 +35,19 @@ public class AuthManager : Singleton<AuthManager>
     public ReactiveProperty<bool> IsGuestSignIned;
     public ReactiveProperty<string> PlayerID;
 
+    private const string Key = "session_uuid";
+
+    public static string GetOrCreateUUID()
+    {
+        if (!PlayerPrefs.HasKey(Key))
+        {
+            string uuid = System.Guid.NewGuid().ToString();
+            PlayerPrefs.SetString(Key, uuid);
+            PlayerPrefs.Save();
+        }
+        return PlayerPrefs.GetString(Key);
+    }
+
     public async UniTask InitializeAsync()
     {
         try
@@ -53,6 +67,30 @@ public class AuthManager : Singleton<AuthManager>
     public void InitGPGS()
     {
         PlayGamesPlatform.Activate();
+    }
+    public async UniTask RegisterSessionAsync()
+    {
+        var uuid = GetOrCreateUUID();
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "sessionUUID", uuid }
+        };
+
+        await CloudCodeService.Instance.CallEndpointAsync("RegisterSession", parameters);
+    }
+
+    public async UniTask SaveWithSessionValidationAsync(object saveData)
+    {
+        var uuid = GetOrCreateUUID();
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "sessionUUID", uuid },
+            { "saveData", saveData }
+        };
+
+        await CloudCodeService.Instance.CallEndpointAsync("SaveIfSessionValid", parameters);
     }
 
     public UniTask<string> RequestAuthTokenFromGPGS()
@@ -136,6 +174,7 @@ public class AuthManager : Singleton<AuthManager>
 
             // Shows how to get the playerID
             Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
+            await RegisterSessionAsync();
             await LoadUserDataFromServer();
 
         }

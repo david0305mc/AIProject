@@ -1,0 +1,13 @@
+D:\DevD\AIProject\HelloWorld\Project\bin\Release\net6.0\any\HelloWorld.deps.json
+D:\DevD\AIProject\HelloWorld\Project\bin\Release\net6.0\any\HelloWorld.dll
+D:\DevD\AIProject\HelloWorld\Project\bin\Release\net6.0\any\HelloWorld.pdb
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\HelloWorld.csproj.AssemblyReference.cache
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\HelloWorld.GeneratedMSBuildEditorConfig.editorconfig
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\HelloWorld.AssemblyInfoInputs.cache
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\HelloWorld.AssemblyInfo.cs
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\HelloWorld.csproj.CoreCompileInputs.cache
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\HelloWorld.sourcelink.json
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\HelloWorld.dll
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\refint\HelloWorld.dll
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\HelloWorld.pdb
+D:\DevD\AIProject\HelloWorld\Project\obj\Release\net6.0\any\ref\HelloWorld.dll

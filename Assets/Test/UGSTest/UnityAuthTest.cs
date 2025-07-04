@@ -148,7 +148,8 @@ public class UnityAuthTest : MonoBehaviour
         {
             UserDataManager.Instance.ReactivePlayerData.SparklingInt.Value++;
             var saveData = UserDataManager.Instance.ToPlayerSaveData();
-            await AuthManager.Instance.ForceSaveObjectData("Save01", saveData);
+            // await AuthManager.Instance.ForceSaveObjectData("Save01", saveData);
+            await AuthManager.Instance.SaveWithSessionValidationAsync(saveData);
         });
 
         cloudCodeButton.onClick.AddListener(async () =>

@@ -2252,8 +2252,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   idInputField: {fileID: 729484446}
   passwordInputField: {fileID: 400904460}
-  PointText: {fileID: 472630767}
-  PlayerIDText: {fileID: 995787237}
+  pointText: {fileID: 472630767}
+  playerIDText: {fileID: 995787237}
   signUpButton: {fileID: 1266834861}
   signInButton: {fileID: 1969161349}
   signInGPGS: {fileID: 1483897021}
@@ -2262,7 +2262,7 @@ MonoBehaviour:
   guestLogin: {fileID: 870617550}
   saveButton: {fileID: 2126000688}
   loadButton: {fileID: 1410730415}
-  IncreasePointButton: {fileID: 4649383}
+  increasePointButton: {fileID: 4649383}
   cloudCodeButton: {fileID: 1024090328}
 --- !u!4 &1245234401
 Transform:
@@ -2577,11 +2577,11 @@ RectTransform:
   - {fileID: 1410730418}
   m_Father: {fileID: 1407906043}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -572.45013}
-  m_SizeDelta: {x: 0, y: -1144.8998}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: -544.5}
+  m_SizeDelta: {x: 1080, y: 1920}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1302526248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2602,7 +2602,7 @@ MonoBehaviour:
   m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 290, y: 250}
+  m_CellSize: {x: 250, y: 250}
   m_Spacing: {x: 10, y: 10}
   m_Constraint: 0
   m_ConstraintCount: 2
