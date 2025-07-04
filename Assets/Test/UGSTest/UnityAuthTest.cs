@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Unity.Services.CloudSave;
 using UniRx;
 using Unity.Services.CloudCode;
+using Unity.Services.CloudCode.GeneratedBindings;
 
 public class UnityAuthTest : MonoBehaviour
 {
@@ -146,10 +147,15 @@ public class UnityAuthTest : MonoBehaviour
 
         increasePointButton.onClick.AddListener(async () =>
         {
-            UserDataManager.Instance.ReactivePlayerData.SparklingInt.Value++;
-            var saveData = UserDataManager.Instance.ToPlayerSaveData();
-            // await AuthManager.Instance.ForceSaveObjectData("Save01", saveData);
-            await AuthManager.Instance.SaveWithSessionValidationAsync(saveData);
+
+
+            var module = new HelloWorldBindings(CloudCodeService.Instance);
+            var result = await module.SayHello("World");
+            Debug.Log(result);
+            // UserDataManager.Instance.ReactivePlayerData.SparklingInt.Value++;
+            // var saveData = UserDataManager.Instance.ToPlayerSaveData();
+            // // await AuthManager.Instance.ForceSaveObjectData("Save01", saveData);
+            // await AuthManager.Instance.SaveWithSessionValidationAsync(saveData);
         });
 
         cloudCodeButton.onClick.AddListener(async () =>
